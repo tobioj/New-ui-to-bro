@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- The desktop host injects its bridge functions with `new Function`, so
+       unsafe-eval is required here. No remote script source is permitted. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' file:; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' file: data: blob:; font-src 'self' data:; connect-src 'self' ws://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Workspace Controller</title>
+  <link rel="stylesheet" href="css/styles.css?v=1">
+  <link rel="stylesheet" href="css/mission-control.css?v=1">
+  <link rel="stylesheet" href="css/startup-motion.css?v=1">
+  <link rel="stylesheet" href="css/workspace.css?v=1">
+  <link rel="stylesheet" href="css/pod-workspace.css?v=1">
+  <link rel="stylesheet" href="css/operations-fleet-workspace.css?v=1">
+  <link rel="stylesheet" href="css/focus-layout.css?v=1">
+  <link rel="stylesheet" href="css/workflow-canvas.css?v=1">
+  <link rel="stylesheet" href="css/action-feedback.css?v=1">
+  <link rel="stylesheet" href="css/navigation-polish.css?v=1">
+  <link rel="stylesheet" href="css/window-visibility.css?v=1">
+  <link rel="stylesheet" href="css/nav-motion.css?v=1">
+</head>
+<body>
+  <div class="app-startup-motion" id="app-startup-motion" role="status" aria-live="polite" aria-label="Preparing the workspace" data-motion="prism-23" data-duration-ms="4600">
+    <div class="startup-motion-composition">
+      <div class="startup-prism-stage" aria-hidden="true">
+        <div class="startup-prism-rig">
+          <span class="startup-prism-pane startup-prism-pane-back"></span>
+          <span class="startup-prism-pane startup-prism-pane-middle"></span>
+          <span class="startup-prism-pane startup-prism-pane-front"></span>
+          <div class="startup-prism-mark">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 8h6M7 11h10M7 14h4"/><circle cx="17" cy="8" r="1.5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="startup-motion-copy">
+        <h2>Welcome back.</h2>
+        <p>Your workspace is getting ready.</p>
+      </div>
+      <div class="startup-motion-progress" role="progressbar" aria-label="Application loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Starting">
+        <span><i></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 8h6M7 11h10M7 14h4"/><circle cx="17" cy="8" r="1.5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Workspace</h1>
+          <span class="version-badge" id="app-version-badge">Version loading…</span>
+        </div>
+        <button class="shell-toggle shell-rail-toggle" id="sidebar-toggle" type="button" aria-label="Collapse navigation" aria-expanded="true" title="Collapse navigation">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </div>
+
+      <nav class="nav-menu" aria-label="Primary navigation">
+        <span class="nav-label">Workspace</span>
+        <button class="nav-item active" data-tab="pods-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Profiles &amp; Groups
+        </button>
+        <button class="nav-item" data-tab="workflows-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
+          Workflows
+        </button>
+        <button class="nav-item" data-tab="reports-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/></svg>
+          Run Reports
+        </button>
+        <button class="nav-item" data-tab="task-schedules-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M8 15h3M8 18h6"/></svg>
+          Schedules
+        </button>
+        <button class="nav-item" data-tab="manual-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+          Local Tools
+        </button>
+        <button class="nav-item" data-tab="operating-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.08A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.08A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.08A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.12.4.33.75.6 1 .3.27.68.4 1.1.4h.08v4h-.08a1.7 1.7 0 0 0-1.7.6z"/></svg>
+          Operations
+        </button>
+        <button class="nav-item" data-tab="customize-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          Customization
+        </button>
+        <button class="nav-item" data-tab="deploy-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          Batch Runs
+        </button>
+        <button class="nav-item" data-tab="monitor-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12 18 6M12 3v2M21 12h-2M12 21v-2M3 12h2"/><circle cx="12" cy="12" r="2"/></svg>
+          Monitor
+        </button>
+        <button class="nav-item" data-tab="alerts-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Alerts
+        </button>
+        <button class="nav-item" data-tab="console-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Activity Log
+        </button>
+        <button class="nav-item" data-tab="system-tab" type="button">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          System Health
+        </button>
+      </nav>
+    </aside>
+    <button class="sidebar-scrim" id="sidebar-scrim" type="button" aria-label="Close navigation"></button>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-nav-toggle" id="mobile-nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+          <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="topbar-title">
+          <span class="topbar-eyebrow">Workspace</span>
+          <h2 id="view-title" tabindex="-1">Profiles &amp; Groups</h2>
+        </div>
+        <div class="topbar-stats">
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode">
+            <svg class="theme-icon-sun" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+            <svg class="theme-icon-moon" aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.9 13a9 9 0 0 1-9.9-9.9A9 9 0 1 0 20.9 13z"/></svg>
+          </button>
+          <button class="pulse-badge" id="pulse-badge" type="button" style="display: none;">
+            <span class="pulse-indicator"></span>
+            <span id="pulse-badge-count">0</span>
+          </button>
+          <div class="stat-pill">
+            <span class="label">Concurrency</span>
+            <span class="value" id="stat-concurrency">2</span>
+          </div>
+          <div class="stat-pill">
+            <span class="label">RAM Available</span>
+            <span class="value" id="stat-ram">-- MB</span>
+          </div>
+          <div class="stat-pill">
+            <span class="label">CPU Usage</span>
+            <span class="value" id="stat-cpu">-- %</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-scroll">
+        <!-- Profiles & Groups Tab -->
+        <section id="pods-tab" class="tab-pane active">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Workspace</span>
+              <h3>Profiles and groups</h3>
+              <p>Organize isolated browser profiles into groups, run tasks, and follow execution from one place.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-primary" id="btn-open-create-pod" type="button">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Group
+              </button>
+            </div>
+          </div>
+
+          <div class="pod-grid" id="pod-list-container">
+            <!-- Dynamically populated groups -->
+          </div>
+
+          <div class="profile-section" id="profile-section" style="display: none;">
+            <div class="section-header">
+              <div>
+                <h3 id="selected-pod-name">Group Profiles</h3>
+                <p class="subtitle" id="selected-pod-target">No target URL</p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-secondary" id="btn-open-create-profile">+ Add Profile</button>
+                <button class="btn btn-danger-outline" id="btn-delete-selected-pod">Delete Group</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Profile</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Region</th>
+                    <th scope="col">Activity / Next</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="profile-table-body">
+                  <!-- Dynamically populated profiles -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Workflows Tab -->
+        <section id="workflows-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Task builder</span>
+              <h3>Workflows</h3>
+              <p>Create, save, validate and reliably execute reusable browser task pipelines with deterministic checkpoints.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-open-ai-workflow" type="button">Assistant</button>
+              <button class="btn btn-primary" id="btn-open-create-workflow" type="button">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Workflow
+              </button>
+              <button class="btn btn-secondary" id="btn-refresh-workflows" type="button">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="workflow-grid" id="workflow-list-container">
+            <!-- Dynamically populated workflow cards -->
+          </div>
+
+          <div class="workflow-runs-section" id="workflow-runs-section">
+            <div class="section-header">
+              <div>
+                <span class="section-kicker">Execution telemetry</span>
+                <h3>Run History &amp; Safe Checkpoints</h3>
+                <p class="subtitle">Inspect pass/fail results, timings, checkpoint recovery states, and artifact screenshots.</p>
+              </div>
+              <div class="header-actions">
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Run ID</th>
+                    <th scope="col">Workflow</th>
+                    <th scope="col">Profile</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Steps Progress</th>
+                    <th scope="col">Checkpoint</th>
+                    <th scope="col">Metrics &amp; Timings</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="workflow-runs-table-body">
+                  <!-- Dynamically populated runs -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Run Reports Tab -->
+        <section id="reports-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Local reporting</span>
+              <h3>Run Reports</h3>
+              <p>One searchable history for task and workflow runs. Playback figures are locally observed.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-report-export-json" type="button">Export JSON</button>
+              <button class="btn btn-secondary" id="btn-report-export-csv" type="button">Export CSV</button>
+              <button class="btn btn-primary" id="btn-report-refresh" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div class="metrics-grid" id="report-summary-cards">
+            <div class="metric-card"><span class="metric-index">01</span><h4>Active</h4><p class="metric-value" id="report-active-count">0</p></div>
+            <div class="metric-card"><span class="metric-index">02</span><h4>Completed</h4><p class="metric-value text-success" id="report-completed-count">0</p></div>
+            <div class="metric-card"><span class="metric-index">03</span><h4>Failed / Stopped</h4><p class="metric-value" id="report-terminal-count">0 / 0</p></div>
+            <div class="metric-card"><span class="metric-index">04</span><h4>Local Playback Observed</h4><p class="metric-value" id="report-local-playback">0s</p><small>Locally observed</small></div>
+          </div>
+
+          <div class="card" style="margin-top: 18px;">
+            <div class="report-filter-head">
+              <h4>Find runs</h4>
+              <button class="btn btn-secondary btn-sm" id="report-more-filters" type="button" aria-expanded="false" aria-controls="report-advanced-fields">More filters</button>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group"><label for="report-search">Search</label><input id="report-search" class="input-field" placeholder="Run ID, profile, workflow, error"></div>
+              <div class="form-group"><label for="report-status-filter">Status</label><select id="report-status-filter" class="input-field"><option value="">All statuses</option><option>QUEUED</option><option>RUNNING</option><option>COMPLETED</option><option>FAILED</option><option>STOPPED</option></select></div>
+              <div class="form-group"><label for="report-type-filter">Run Type</label><select id="report-type-filter" class="input-field"><option value="">Task and workflow</option><option value="task">Task</option><option value="workflow">Workflow</option></select></div>
+            </div>
+            <div class="form-row-2" id="report-advanced-fields">
+              <div class="form-group"><label for="report-profile-filter">Profile ID</label><input id="report-profile-filter" class="input-field" placeholder="Optional profile UUID"></div>
+              <div class="form-group"><label for="report-workflow-filter">Workflow ID</label><input id="report-workflow-filter" class="input-field" placeholder="Optional workflow UUID"></div>
+              <div class="form-group"><label for="report-start-filter">From (UTC)</label><input id="report-start-filter" class="input-field" type="datetime-local"></div>
+              <div class="form-group"><label for="report-end-filter">To (UTC)</label><input id="report-end-filter" class="input-field" type="datetime-local"></div>
+            </div>
+            <div id="report-feedback" class="form-feedback" aria-live="polite"></div>
+          </div>
+
+          <div class="workflow-runs-section">
+            <div class="table-container"><table class="data-table"><thead><tr><th>Run</th><th>Type</th><th>Profile</th><th>Workflow</th><th>Status</th><th>Local Playback</th><th>Timings</th><th>Retries</th><th>Evidence</th></tr></thead><tbody id="report-history-body"></tbody></table></div>
+            <div class="header-actions" style="margin-top: 12px;"><button class="btn btn-secondary btn-sm" id="btn-report-prev" type="button">Previous</button><span id="report-page-meta" class="form-hint"></span><button class="btn btn-secondary btn-sm" id="btn-report-next" type="button">Next</button></div>
+          </div>
+        </section>
+
+        <!-- Schedules Tab -->
+        <section id="task-schedules-tab" class="tab-pane" aria-label="Schedules">
+          <div class="action-bar">
+            <div class="action-bar-copy"><span class="section-kicker">Recurring tasks</span><h3>Schedules</h3><p>Plan recurring onboarding runs and workflow executions. Follow each occurrence from its schedule to its run report.</p></div>
+            <div class="action-bar-controls"><button class="btn btn-secondary" data-schedule-refresh type="button">Refresh</button><button class="btn btn-primary" data-new-schedule="task" type="button">New schedule</button></div>
+          </div>
+          <div id="task-schedule-workspace"></div>
+        </section>
+
+        <!-- Operations Tab -->
+        <section id="operations-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Application upkeep</span>
+              <div class="operations-heading-line">
+                <h3>Operations &amp; Maintenance</h3>
+                <div class="operations-status-chip" id="operations-feedback" data-tone="muted" aria-live="polite">Checking status</div>
+              </div>
+              <p>Manage application storage, backups, scheduled upkeep, and diagnostic evidence.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-operations-refresh" type="button">Refresh</button>
+              <button class="btn btn-secondary" id="btn-diagnostics-preview" type="button">Diagnostic Preview</button>
+              <button class="btn btn-primary" id="btn-database-backup-now" type="button">Back Up Now</button>
+            </div>
+          </div>
+          <div class="operations-workspace">
+            <div class="operations-subnav-shell">
+              <nav class="operations-subnav" aria-label="Operations sections">
+              <button class="operations-subnav-toggle shell-rail-toggle" id="operations-subnav-toggle" type="button" aria-label="Collapse Operations navigation" aria-expanded="true" title="Collapse Operations navigation">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <span class="operations-nav-heading">Platform</span>
+              <button class="operations-subnav-item" data-operations-view="overview" type="button"><span class="operations-subnav-index">01</span><span>Overview</span></button>
+              <button class="operations-subnav-item" data-operations-view="settings" type="button"><span class="operations-subnav-index">02</span><span>Application Settings</span></button>
+              <button class="operations-subnav-item" data-operations-view="storage" type="button"><span class="operations-subnav-index">03</span><span>Application Data</span></button>
+              <button class="operations-subnav-item" data-operations-view="updates" type="button"><span class="operations-subnav-index">04</span><span>Updates</span></button>
+              <span class="operations-nav-heading">Maintenance &amp; records</span>
+              <button class="operations-subnav-item" data-operations-view="schedules" type="button"><span class="operations-subnav-index">05</span><span>Maintenance Schedules</span></button>
+              <button class="operations-subnav-item" data-operations-view="maintenance" type="button"><span class="operations-subnav-index">06</span><span>Profile Maintenance</span></button>
+              <button class="operations-subnav-item" data-operations-view="backups" type="button"><span class="operations-subnav-index">07</span><span>Backups &amp; Transfer</span></button>
+              </nav>
+              <span class="operations-subnav-outline" aria-hidden="true"></span>
+            </div>
+            <div class="operations-content">
+              <section class="operations-view" data-operations-panel="overview" aria-label="Operations overview">
+
+          <div class="metrics-grid operations-metrics">
+            <div class="metric-card"><span class="metric-index">01</span><h4>Application</h4><p class="metric-value" id="ops-overall-health">Loading…</p></div>
+            <div class="metric-card"><span class="metric-index">02</span><h4>Database</h4><p class="metric-value" id="ops-database-health">Loading…</p></div>
+            <div class="metric-card"><span class="metric-index">03</span><h4>Scheduler</h4><p class="metric-value" id="ops-scheduler-health">Loading…</p></div>
+            <div class="metric-card"><span class="metric-index">04</span><h4>Disk Free</h4><p class="metric-value" id="ops-disk-free">Loading…</p></div>
+          </div>
+
+          <div class="operations-overview-links" aria-label="Operations destinations">
+            <a href="#/system/operations/settings"><span>01 · Settings</span><strong>Application defaults</strong><small>Browsers, concurrency, and export paths</small></a>
+            <a href="#/system/operations/storage"><span>02 · Storage</span><strong>Application data</strong><small>Footprint, folders, and safe relocation</small></a>
+            <a href="#/system/operations/schedules"><span>03 · Upkeep</span><strong>Maintenance schedules</strong><small>Database backups, cache upkeep, and health checks</small></a>
+            <a href="#/system/operations/maintenance"><span>04 · Upkeep</span><strong>Profile maintenance</strong><small>Review browser storage and compaction</small></a>
+            <a href="#/system/operations/backups"><span>05 · Records</span><strong>Backups &amp; transfer</strong><small>Snapshots, profile archives, and workspace transfer</small></a>
+            <a href="#/system/operations/updates"><span>06 · Releases</span><strong>Updates</strong><small>Check or stage signed packages</small></a>
+          </div>
+
+              </section>
+              <section class="operations-view" data-operations-panel="settings" aria-label="Application settings">
+            <div class="card operations-card">
+              <div class="card-heading"><div><span class="section-kicker">Runtime defaults</span><h3>Application Settings</h3></div></div>
+              <div class="settings-grid">
+                <label class="toggle-control"><input type="checkbox" id="setting-browser-visible"><span class="toggle-track"><span class="toggle-thumb"></span></span><span class="toggle-label">Visible browsers</span></label>
+                <label class="toggle-control"><input type="checkbox" id="setting-cursor-visible"><span class="toggle-track"><span class="toggle-thumb"></span></span><span class="toggle-label">Visible cursor</span></label>
+                <label class="toggle-control"><input type="checkbox" id="setting-automatic-backups"><span class="toggle-track"><span class="toggle-thumb"></span></span><span class="toggle-label">Automatic database snapshots</span></label>
+                <div class="form-group"><label for="setting-concurrency">New-launch concurrency</label><input id="setting-concurrency" class="input-field" type="number" min="1" max="10"></div>
+                <div class="form-group"><label for="setting-proxy-health-url">Network health destination</label><input id="setting-proxy-health-url" class="input-field" placeholder="https://example.com/health"><small class="form-hint">Public HTTPS on port 443 only. Disabled until configured.</small></div>
+                <div class="form-group"><label for="setting-backup-destination">Database backup destination</label><div class="path-picker-row"><input id="setting-backup-destination" class="input-field"><button class="btn btn-secondary btn-sm" data-path-picker="setting-backup-destination" type="button">Browse</button></div></div>
+                <div class="form-group"><label for="setting-diagnostics-destination">Diagnostic export destination</label><div class="path-picker-row"><input id="setting-diagnostics-destination" class="input-field"><button class="btn btn-secondary btn-sm" data-path-picker="setting-diagnostics-destination" type="button">Browse</button></div></div>
+                <div class="form-group"><label for="setting-export-destination">Default manual export destination</label><div class="path-picker-row"><input id="setting-export-destination" class="input-field"><button class="btn btn-secondary btn-sm" data-path-picker="setting-export-destination" type="button">Browse</button></div></div>
+                <label class="toggle-control"><input type="checkbox" id="setting-ask-export-location"><span class="toggle-track"><span class="toggle-thumb"></span></span><span class="toggle-label">Ask where to save manual exports</span></label>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary btn-sm" id="btn-save-operations-settings" type="button">Save Settings</button></div>
+              <div class="form-feedback" id="operations-settings-feedback" aria-live="polite"></div>
+            </div>
+              </section>
+
+              <section class="operations-view" data-operations-panel="storage" aria-label="Application data">
+            <div class="card operations-card">
+              <div class="card-heading"><div><span class="section-kicker">Storage footprint</span><h3>Application Data</h3></div><div class="header-actions"><button class="btn btn-secondary btn-sm" id="btn-open-data-root" type="button">Open Folder</button><button class="btn btn-secondary btn-sm" id="btn-recover-locks" type="button">Recover Stale Locks</button></div></div>
+              <div class="storage-summary" id="operations-storage-summary"></div>
+              <div class="form-group"><label for="data-relocation-destination">Move application data after restart</label><div class="path-picker-row"><input id="data-relocation-destination" class="input-field" placeholder="Choose a new empty folder"><button class="btn btn-secondary btn-sm" data-path-picker="data-relocation-destination" type="button">Browse</button></div><small class="form-hint">The original remains untouched after a verified copy.</small></div>
+              <div class="header-actions"><button class="btn btn-secondary btn-sm" id="btn-preview-data-move" type="button">Preview Move</button><button class="btn btn-primary btn-sm" id="btn-execute-data-move" type="button" disabled>Move &amp; Prepare Restart</button></div>
+              <div class="form-feedback" id="data-move-feedback" aria-live="polite"></div>
+            </div>
+              </section>
+
+              <section class="operations-view" data-operations-panel="updates" aria-label="Application updates">
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Signed releases</span><h3>Application Updates</h3></div><span class="version-badge" id="operations-version">Loading…</span></div>
+            <p class="card-description">Update checks and installation are always user initiated. Only signed manifests and signed packages are accepted.</p>
+            <div class="header-actions update-actions">
+              <button class="btn btn-secondary" id="btn-check-updates" type="button">Check for Updates</button>
+              <button class="btn btn-secondary" id="btn-choose-update-package" type="button">Choose Signed Package</button>
+              <button class="btn btn-primary" id="btn-stage-update-package" type="button" disabled>Verify &amp; Stage</button>
+              <button class="btn btn-primary" id="btn-launch-staged-update" type="button" disabled>Open Installer</button>
+              <button class="btn btn-secondary" id="btn-launch-rollback" type="button" disabled>Open Previous Installer</button>
+            </div>
+            <div class="form-feedback" id="update-feedback" aria-live="polite"></div>
+          </div>
+              </section>
+
+              <section class="operations-view" data-operations-panel="schedules" aria-label="Schedules">
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Recurring maintenance</span><h3>Schedules</h3></div></div>
+            <div class="schedule-editor">
+              <input id="schedule-name" class="input-field" placeholder="Schedule name">
+              <select id="schedule-task" class="input-field"><option value="database_backup">Database backup</option><option value="profile_compaction">Routine profile compaction</option><option value="profile_readiness_recalculation">Readiness recalculation</option><option value="proxy_health_check">Network health check</option><option value="workflow_run">Workflow run</option><option value="onboarding_run">Onboarding session (profile)</option></select>
+              <select id="schedule-trigger" class="input-field"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="interval">Interval</option></select>
+              <input id="schedule-time" class="input-field" type="time" value="02:30">
+              <input id="schedule-interval" class="input-field" type="number" min="1" max="365" value="1">
+              <select id="schedule-unit" class="input-field"><option value="days">Days</option><option value="hours">Hours</option><option value="minutes">Minutes</option><option value="weeks">Weeks</option></select>
+              <input id="schedule-weekdays" class="input-field" placeholder="mon,wed,fri">
+              <input id="schedule-timezone" class="input-field" value="America/Toronto" placeholder="Timezone">
+              <input id="schedule-workflow-id" class="input-field" placeholder="Workflow ID (workflow runs)">
+              <input id="schedule-profile-id" class="input-field" placeholder="Profile ID (workflow runs)">
+              <select id="schedule-onboarding-profile" class="input-field"><option value="">Choose an onboarding profile</option></select>
+              <select id="schedule-onboarding-proxy" class="input-field"><option value="">Choose an explicit network endpoint</option></select>
+              <input id="schedule-onboarding-duration" class="input-field" type="number" min="1" max="120" value="4">
+              <button class="btn btn-primary" id="btn-create-schedule" type="button">Create Schedule</button>
+            </div>
+            <div class="form-feedback" id="schedule-feedback" aria-live="polite"></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Task</th><th>Trigger</th><th>Status</th><th>Next run</th><th>Actions</th></tr></thead><tbody id="operations-schedules-body"></tbody></table></div>
+          </div>
+              </section>
+
+              <section class="operations-view" data-operations-panel="maintenance" aria-label="Profile maintenance">
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Safe cache maintenance</span><h3>Profile Storage &amp; Compaction</h3></div></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Profile</th><th>Size</th><th>Lock</th><th>Actions</th></tr></thead><tbody id="operations-profiles-body"></tbody></table></div>
+            <div class="form-feedback" id="compaction-feedback" aria-live="polite"></div>
+          </div>
+              </section>
+
+              <section class="operations-view" data-operations-panel="backups" aria-label="Backups and evidence">
+          <div class="operations-grid">
+            <div class="card operations-card"><div class="card-heading"><div><span class="section-kicker">Bounded snapshots</span><h3>Database Backups</h3></div></div><p class="card-description">Automatic snapshots retain 30 days, at most 30 files, and always preserve the newest three.</p><div class="table-container compact-table"><table class="data-table"><thead><tr><th>Created</th><th>Size</th><th>Status</th><th>Reason</th></tr></thead><tbody id="operations-backups-body"></tbody></table></div></div>
+            <div class="card operations-card"><div class="card-heading"><div><span class="section-kicker">Execution evidence</span><h3>Recent Schedule Outcomes</h3></div></div><div class="table-container compact-table"><table class="data-table"><thead><tr><th>Schedule</th><th>Status</th><th>When</th><th>Detail</th></tr></thead><tbody id="operations-runs-body"></tbody></table></div></div>
+          </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- Customization Tab -->
+        <section id="customize-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Configuration</span>
+              <h3>Customization</h3>
+              <p>Configuration as first-class input: targets, session mix, timing and windows, region placement, and naming. Everything validates at the boundary, shows a derived preview, and only then applies.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-customize-reload" type="button">Reload</button>
+              <button class="btn btn-secondary" id="btn-customize-preview" type="button">Preview Changes</button>
+              <button class="btn btn-primary" id="btn-customize-apply" type="button" disabled>Apply Changes</button>
+            </div>
+          </div>
+
+          <div class="customize-grid">
+            <div class="card customize-card customize-card-wide">
+              <div class="card-heading"><div><span class="section-kicker">Group setup</span><h3>Group Targets</h3></div></div>
+              <p class="card-description">Target URL, region placement, and which workflows receive the allowlists. Region changes apply to profiles that inherit the group region.</p>
+              <div id="customize-campaign-list" class="customize-pod-list"></div>
+            </div>
+
+            <div class="card customize-card">
+              <div class="card-heading"><div><span class="section-kicker">Budget defaults</span><h3>Session Mix</h3></div></div>
+              <div class="form-row-2">
+                <div class="form-group"><label for="mix-warmer-ratio">Onboarding share (parts)</label><input id="mix-warmer-ratio" class="input-field" type="number" min="1" max="50"></div>
+                <div class="form-group"><label for="mix-target-ratio">Target share (parts)</label><input id="mix-target-ratio" class="input-field" type="number" min="1" max="50"></div>
+                <div class="form-group"><label for="mix-warmer-min">Onboarding minutes (min)</label><input id="mix-warmer-min" class="input-field" type="number" min="2" max="120"></div>
+                <div class="form-group"><label for="mix-warmer-max">Onboarding minutes (max)</label><input id="mix-warmer-max" class="input-field" type="number" min="2" max="120"></div>
+                <div class="form-group"><label for="mix-target-min">Target minutes (min)</label><input id="mix-target-min" class="input-field" type="number" min="2" max="120"></div>
+                <div class="form-group"><label for="mix-target-max">Target minutes (max)</label><input id="mix-target-max" class="input-field" type="number" min="2" max="120"></div>
+                <div class="form-group"><label for="mix-max-day">Max runs / profile / day</label><input id="mix-max-day" class="input-field" type="number" min="1" max="24"></div>
+              </div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="customize-window-card">
+              <div class="card-heading"><div><span class="section-kicker">Operating window</span><h3>Windows &amp; Active Hours</h3></div></div>
+              <div class="form-row-2">
+                <div class="form-group"><label for="rhythm-start">Window start</label><input id="rhythm-start" class="input-field" type="time"></div>
+                <div class="form-group"><label for="rhythm-end">Window end</label><input id="rhythm-end" class="input-field" type="time"></div>
+                <div class="form-group"><label for="rhythm-timezone">Timezone (IANA)</label><input id="rhythm-timezone" class="input-field" placeholder="America/Toronto"></div>
+              </div>
+              <div class="console-chips" id="rhythm-days">
+                <button class="console-chip" data-rhythm-day="mon" type="button">Mon</button>
+                <button class="console-chip" data-rhythm-day="tue" type="button">Tue</button>
+                <button class="console-chip" data-rhythm-day="wed" type="button">Wed</button>
+                <button class="console-chip" data-rhythm-day="thu" type="button">Thu</button>
+                <button class="console-chip" data-rhythm-day="fri" type="button">Fri</button>
+                <button class="console-chip" data-rhythm-day="sat" type="button">Sat</button>
+                <button class="console-chip" data-rhythm-day="sun" type="button">Sun</button>
+              </div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="customize-visibility-card">
+              <div class="card-heading"><div><span class="section-kicker">Window management</span><h3>Windows &amp; Visibility</h3></div></div>
+              <p class="card-description">Manage how headed profile windows occupy reusable desktop slots. Rotation changes which live profile desktop is shown; it does not change run pacing or network use.</p>
+              <div class="form-row-2 visibility-preview-fields">
+                <div class="form-group"><label for="visibility-managed">Managed windows</label><select id="visibility-managed" class="input-field"><option value="true">Enabled (desktop slots + rotation)</option><option value="false">Off</option></select></div>
+                <div class="form-group"><label for="visibility-cadence">Rotation cadence (minutes)</label><input id="visibility-cadence" class="input-field" type="number" min="1" max="480" step="1" required><small class="form-hint">Round-robin across live profile desktops; pauses while a local window is open.</small></div>
+                <div class="form-group"><label for="visibility-slots">Desktop slots (max)</label><input id="visibility-slots" class="input-field" type="number" min="2" max="32" step="1" required><small class="form-hint">Upper bound on slots created as needed and reused per profile.</small></div>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary" id="btn-visibility-save" type="button">Save Visibility</button></div>
+              <div class="form-feedback" id="visibility-feedback" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="global-rhythm-card">
+              <div class="card-heading"><div><span class="section-kicker">Daily timing policy</span><h3>Timing</h3></div><span class="status-chip" id="global-rhythm-state">Loading…</span></div>
+              <p class="card-description">Paces scheduled runs across a profile's local day. Manual runs remain human-timed. Group-specific exceptions remain in Profiles &amp; Groups.</p>
+              <div class="form-row-2">
+                <div class="form-group"><label for="global-rhythm-enabled">Enforcement</label><select id="global-rhythm-enabled" class="input-field"><option value="true">Enabled (scheduled runs)</option><option value="false">Off</option></select></div>
+                <div class="form-group"><label for="global-rhythm-rest-source">Rest window source</label><select id="global-rhythm-rest-source" class="input-field"><option value="persona">Profile active hours (complement)</option><option value="fixed">Fixed window</option><option value="off">No rest window</option></select></div>
+                <div class="form-group"><label for="global-rhythm-minutes-cap">Daily time cap (minutes, 0 = off)</label><input id="global-rhythm-minutes-cap" class="input-field" type="number" min="0" max="1440" step="1"><small class="form-hint">Completed and running run minutes per local day.</small></div>
+                <div class="form-group"><label for="global-rhythm-daily-sessions">Profile daily-runs cap</label><select id="global-rhythm-daily-sessions" class="input-field"><option value="true">Enforce maximum</option><option value="false">Off</option></select></div>
+                <div class="form-group"><label for="global-rhythm-rest-start">Fixed rest start (local hour)</label><input id="global-rhythm-rest-start" class="input-field" type="number" min="0" max="23" step="1"><small class="form-hint">Used when the rest source is Fixed window.</small></div>
+                <div class="form-group"><label for="global-rhythm-rest-end">Fixed rest end (local hour)</label><input id="global-rhythm-rest-end" class="input-field" type="number" min="0" max="23" step="1"></div>
+                <div class="form-group"><label for="global-rhythm-active-hours">Active-hours acceptance</label><select id="global-rhythm-active-hours" class="input-field"><option value="true">Enabled (profile hour weight)</option><option value="false">Off</option></select></div>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary" id="btn-global-rhythm-save" type="button">Save Timing</button></div>
+              <div class="form-feedback" id="global-rhythm-feedback" aria-live="polite"></div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="target-gate-card">
+              <div class="card-heading"><div><span class="section-kicker">Readiness policy</span><h3>Readiness Rules</h3></div><span class="status-chip" id="target-gate-state">Loading…</span></div>
+              <p class="card-description">The profile thresholds before a profile runs target tasks. Onboarding counts completed run time, not time since a profile was created.</p>
+              <div class="form-row-2">
+                <div class="form-group"><label for="target-gate-onboarding-hours">Min completed onboarding (hours)</label><input id="target-gate-onboarding-hours" class="input-field" type="number" min="0" max="1000" step="0.01"><small class="form-hint">0.10 hours is six minutes of completed onboarding runs.</small></div>
+                <div class="form-group"><label for="target-gate-trust-score">Min readiness score (0–1)</label><input id="target-gate-trust-score" class="input-field" type="number" min="0" max="1" step="0.01"></div>
+                <div class="form-group"><label for="target-gate-degraded-floor">Degraded score floor (0–1)</label><input id="target-gate-degraded-floor" class="input-field" type="number" min="0" max="1" step="0.01"><small class="form-hint">Below this, daily recalculation degrades a live profile; recovery is explicit.</small></div>
+                <div class="form-group"><label for="target-gate-challenge-cooldown">Cooldown after a challenge (hours, 0 = off)</label><input id="target-gate-challenge-cooldown" class="input-field" type="number" min="0" max="168" step="1"><small class="form-hint">Target runs wait until the cooldown expires.</small></div>
+                <div class="form-group"><label for="target-gate-challenge-retire">Retire after N challenges (0 = never)</label><input id="target-gate-challenge-retire" class="input-field" type="number" min="0" max="10" step="1"></div>
+                <div class="form-group"><label for="target-gate-challenge-window">Challenge window (days)</label><input id="target-gate-challenge-window" class="input-field" type="number" min="1" max="30" step="1"></div>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary" id="btn-target-gate-save" type="button">Save Readiness Rules</button></div>
+              <div class="form-feedback" id="target-gate-feedback" aria-live="polite"></div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="global-safety-card">
+              <div class="card-heading"><div><span class="section-kicker">Coordination</span><h3>Run Safety</h3></div><span class="status-chip" id="global-safety-state">Loading…</span></div>
+              <p class="card-description">Cross-profile safety caps include manual runs. These are stored with the timing policy, but are not part of scheduled-run pacing.</p>
+              <div class="form-row-2">
+                <div class="form-group"><label for="global-safety-enabled">Cross-profile coordination</label><select id="global-safety-enabled" class="input-field"><option value="true">Enabled</option><option value="false">Off</option></select></div>
+                <div class="form-group"><label for="global-safety-cooldown">Same-target cooldown (minutes, 0 = off)</label><input id="global-safety-cooldown" class="input-field" type="number" min="0" max="1440" step="1"></div>
+                <div class="form-group"><label for="global-safety-exit-runs">Endpoint alternation runs (0 = off)</label><input id="global-safety-exit-runs" class="input-field" type="number" min="0" max="10" step="1"></div>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary" id="btn-global-safety-save" type="button">Save Run Safety</button></div>
+              <div class="form-feedback" id="global-safety-feedback" aria-live="polite"></div>
+            </div>
+
+            <div class="card customize-card customize-card-wide" id="global-resources-card">
+              <div class="card-heading"><div><span class="section-kicker">Admission gate</span><h3>Admission &amp; Resources</h3></div><span class="status-chip" id="global-resources-state">Loading…</span></div>
+              <p class="card-description">Automated admission pacing and resource thresholds. New-launch concurrency is configured separately in <a href="#/system/operations">Operations</a>; CPU is advisory, while RAM and concurrency gate new runs.</p>
+              <div class="form-row-2">
+                <div class="form-group"><label for="global-resources-enabled">Admission pacing</label><select id="global-resources-enabled" class="input-field"><option value="true">Enabled (gap + jitter)</option><option value="false">Off</option></select></div>
+                <div class="form-group"><label for="global-resources-gap">Minimum gap (seconds)</label><input id="global-resources-gap" class="input-field" type="number" min="30" max="3600" step="1"></div>
+                <div class="form-group"><label for="global-resources-jitter">Jitter on top (seconds)</label><input id="global-resources-jitter" class="input-field" type="number" min="0" max="300" step="1"></div>
+                <div class="form-group"><label for="global-resources-cpu">CPU note threshold (%)</label><input id="global-resources-cpu" class="input-field" type="number" min="50" max="100" step="0.1"></div>
+                <div class="form-group"><label for="global-resources-ram-warn">RAM warn floor (% available)</label><input id="global-resources-ram-warn" class="input-field" type="number" min="1" max="50" step="0.1"></div>
+                <div class="form-group"><label for="global-resources-ram-critical">RAM critical floor (% available)</label><input id="global-resources-ram-critical" class="input-field" type="number" min="1" max="30" step="0.1"></div>
+                <div class="form-group"><label for="global-resources-factor">Predictive safety factor (×)</label><input id="global-resources-factor" class="input-field" type="number" min="1" max="3" step="0.05"></div>
+                <div class="form-group"><label for="global-resources-pressure">Under RAM pressure, new runs load</label><select id="global-resources-pressure" class="input-field"><option value="true">Data saver</option><option value="false">Keep quality setting</option></select></div>
+              </div>
+              <div class="header-actions"><button class="btn btn-primary" id="btn-global-resources-save" type="button">Save Resources</button></div>
+              <div class="form-feedback" id="global-resources-feedback" aria-live="polite"></div>
+            </div>
+
+            <div class="card customize-card" id="customize-personas-card">
+              <div class="card-heading"><div><span class="section-kicker">Profile behavior</span><h3>Assignment Rules</h3></div></div>
+              <div class="form-group"><label for="personas-mode">Assignment mode</label><select id="personas-mode" class="input-field"><option value="rule">By rule (pool + weights)</option><option value="manual">By hand (operator chooses)</option></select></div>
+              <label>Default profile pool</label>
+              <div id="personas-pool" class="persona-pool"></div>
+              <div class="header-actions"><button class="btn btn-secondary btn-sm" id="btn-personas-add" type="button">+ Add profile type</button></div>
+              <small class="form-hint">Per-group pools arrive with the batch desk; this default pool applies everywhere.</small>
+            </div>
+
+            <div class="card customize-card" id="customize-naming-card">
+              <div class="card-heading"><div><span class="section-kicker">Consistency</span><h3>Naming</h3></div></div>
+              <div class="form-group"><label for="naming-pattern">Profile name pattern</label><input id="naming-pattern" class="input-field" placeholder="{group}-{archetype}-{index:02d}"><small class="form-hint">Tokens: {group} {archetype} {index} {region}. Must include {index}.</small></div>
+              <div class="form-group"><label for="naming-run-prefix">Run label prefix</label><input id="naming-run-prefix" class="input-field" placeholder="Optional"></div>
+              <div id="naming-examples" class="form-hint"></div>
+            </div>
+          </div>
+
+            <div class="card customize-card customize-card-wide" id="spend-guard-card">
+              <div class="card-heading">
+                <div><span class="section-kicker">Metered bandwidth</span><h3>Bandwidth Limits</h3></div>
+                <span class="status-chip" id="spend-guard-state">Loading…</span>
+              </div>
+              <p class="card-description">Limits on metered bandwidth. Nothing enforces until a limit is set; refusals gate automated launches only. By-hand routed reads always count; they are never blocked. Switching providers means editing the price on a tier below — no code, no env file.</p>
+              <div class="form-row-2">
+                <div class="form-group"><label for="sg-fleet-gb">Daily budget (GB)</label><input id="sg-fleet-gb" class="input-field" type="number" min="0" step="0.01" placeholder="unset — no refusal"></div>
+                <div class="form-group"><label for="sg-fleet-usd">Daily budget ($)</label><input id="sg-fleet-usd" class="input-field" type="number" min="0" step="0.01" placeholder="unset — no refusal"></div>
+                <div class="form-group"><label for="sg-profile-gb">Per-profile daily budget (GB)</label><input id="sg-profile-gb" class="input-field" type="number" min="0" step="0.01" placeholder="unset — no refusal"></div>
+                <div class="form-group"><label for="sg-profile-usd">Per-profile daily budget ($)</label><input id="sg-profile-usd" class="input-field" type="number" min="0" step="0.01" placeholder="unset — no refusal"></div>
+                <div class="form-group"><label for="sg-run-ceiling">Per-run ceiling (MB)</label><input id="sg-run-ceiling" class="input-field" type="number" min="1" step="1" placeholder="unset — no mid-run stop"></div>
+                <div class="form-group"><label for="sg-warn-pct">Warn at (% of budget)</label><input id="sg-warn-pct" class="input-field" type="number" min="1" max="100" value="80"></div>
+                <div class="form-group"><label for="sg-margin-pct">Safety margin (%)</label><input id="sg-margin-pct" class="input-field" type="number" min="0" max="100" value="0"><small class="form-hint">Extra % added to measured bytes when checking limits (covers provider overhead).</small></div>
+                <div class="form-group"><label for="sg-timezone">Day boundary timezone (IANA)</label><input id="sg-timezone" class="input-field" placeholder="inherits the timing timezone"><small class="form-hint">The calendar day budgets reset on, matched to how provider dashboards report.</small></div>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-primary" id="btn-sg-save" type="button">Save Limits</button>
+              </div>
+              <div class="form-feedback" id="sg-feedback" aria-live="polite"></div>
+              <div id="sg-readout" class="form-hint" style="white-space: pre-line;">Loading today's usage…</div>
+              <h4 style="margin-top: 14px; margin-Profiletom: 4px;">Tiers &amp; prices</h4>
+              <div class="form-hint">Priced inventory classes you define — assign them per endpoint on the Network tab. Unpriced endpoints still meter GB but cannot count toward $-limits. Price is snapshotted per usage event: editing a price never rewrites history.</div>
+              <div class="table-container compact-table"><table class="data-table"><thead><tr><th>Name</th><th>$/GB</th><th>Monthly GB cap</th><th>Pin (min)</th><th>IP roll</th><th>Assigned endpoints</th><th>Actions</th></tr></thead><tbody id="sg-tier-body"></tbody></table></div>
+              <div class="form-row-2" style="margin-top: 8px;">
+                <div class="form-group"><label for="sg-tier-name">New tier name</label><input id="sg-tier-name" class="input-field" placeholder="e.g. Residential premium"></div>
+                <div class="form-group"><label for="sg-tier-price">$/GB (blank = unpriced)</label><input id="sg-tier-price" class="input-field" type="number" min="0" step="0.01" placeholder="unset"></div>
+                <div class="form-group"><label for="sg-tier-cap">Monthly GB cap (optional)</label><input id="sg-tier-cap" class="input-field" type="number" min="0" step="0.1" placeholder="unset"></div>
+                <div class="form-group"><label for="sg-tier-pin">Pin window, min (blank = 120)</label><input id="sg-tier-pin" class="input-field" type="number" min="1" max="1440" step="1" placeholder="120"></div>
+                <div class="form-group"><label for="sg-tier-roll">If the endpoint IP rolls</label><select id="sg-tier-roll" class="input-field"><option value="continue">continue the run</option><option value="abort_on_roll">abort the run</option></select></div>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-sg-tier-add" type="button">+ Add tier</button>
+              </div>
+            </div>
+          <div class="card customize-card" id="customize-preview-card" style="display: none;">
+            <div class="card-heading"><div><span class="section-kicker">Derived preview</span><h3>Preview</h3></div></div>
+            <div id="customize-effects"></div>
+          </div>
+          <div id="customize-errors" class="form-feedback" aria-live="polite"></div>
+          <div id="customize-feedback" class="form-feedback" aria-live="polite"></div>
+        </section>
+
+        <!-- Batch Runs Tab -->
+        <section id="deploy-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Compose, preview, run</span>
+              <h3>Batch Runs</h3>
+              <p>Compose a batch — task × targets × placement × cadence × budget — see the derived plan before confirming, then watch it deploy staggered under the concurrency budget. One batch is one auditable object.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-deploy-reload" type="button">Reload</button>
+              <button class="btn btn-secondary" id="btn-dispatch-preview" type="button">Preview Batch</button>
+              <button class="btn btn-primary" id="btn-dispatch-confirm" type="button" disabled>Confirm &amp; Create</button>
+            </div>
+          </div>
+
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Batch composer</span><h3>New Batch</h3></div></div>
+            <div class="form-row-2">
+              <div class="form-group"><label for="dispatch-name">Name</label><input id="dispatch-name" class="input-field" placeholder="Evening sweep"></div>
+              <div class="form-group"><label for="dispatch-workflow-select">Task — workflow</label><select id="dispatch-workflow-select" class="input-field"></select></div>
+              <div class="form-group"><label for="dispatch-target-mode">Targets</label><select id="dispatch-target-mode" class="input-field"><option value="pod">Group (all its profiles)</option><option value="profiles">Explicit profile list</option></select></div>
+              <div class="form-group" id="dispatch-pod-group"><label for="dispatch-target-pod">Group</label><select id="dispatch-target-pod" class="input-field"></select></div>
+              <div class="form-group" id="dispatch-profiles-group" style="display: none;"><label for="dispatch-target-profiles">Profiles (multi-select)</label><select id="dispatch-target-profiles" class="input-field" multiple size="4"></select></div>
+              <div class="form-group"><label for="dispatch-placement-mode">Placement</label><select id="dispatch-placement-mode" class="input-field"><option value="inherit">Inherit (stamped regions)</option><option value="metro">Metro pin</option><option value="country">Country (any city)</option></select></div>
+              <div class="form-group" id="dispatch-region-group" style="display: none;"><label for="dispatch-region">Metro</label><select id="dispatch-region" class="input-field"></select></div>
+              <div class="form-group" id="dispatch-country-group" style="display: none;"><label for="dispatch-country">Country</label><select id="dispatch-country" class="input-field"></select></div>
+              <div class="form-group"><label for="dispatch-cadence-mode">Cadence</label><select id="dispatch-cadence-mode" class="input-field"><option value="now">Run now</option><option value="window">Scheduled window</option><option value="recurring">Recurring</option></select></div>
+              <div class="form-group" id="dispatch-start-group" style="display: none;"><label for="dispatch-start-at">Start (local time)</label><input id="dispatch-start-at" class="input-field" type="datetime-local"></div>
+              <div class="form-group" id="dispatch-interval-group" style="display: none;"><label for="dispatch-interval-minutes">Interval (minutes)</label><input id="dispatch-interval-minutes" class="input-field" type="number" min="15" max="1440" value="60"></div>
+              <section class="dispatch-limits" aria-labelledby="dispatch-limits-title">
+                <div class="dispatch-limits-heading">
+                  <h4 id="dispatch-limits-title">Batch limits</h4>
+                  <span>Applied automatically</span>
+                </div>
+                <dl class="dispatch-limits-grid" id="dispatch-defaults-note" aria-live="polite">
+                  <div class="dispatch-limit">
+                    <dt>Concurrent runs</dt>
+                    <dd><span class="dispatch-limit-value" data-dispatch-limit="concurrency">—</span><span class="dispatch-limit-source">Managed in Operations</span></dd>
+                  </div>
+                  <div class="dispatch-limit">
+                    <dt>Minimum gap</dt>
+                    <dd><span class="dispatch-limit-value" data-dispatch-limit="pacing">—</span><span class="dispatch-limit-detail" data-dispatch-limit="jitter">—</span><span class="dispatch-limit-source">Managed in Admission &amp; Resources</span></dd>
+                  </div>
+                  <div class="dispatch-limit">
+                    <dt>Daily cap</dt>
+                    <dd><span class="dispatch-limit-value" data-dispatch-limit="daily-cap">—</span><span class="dispatch-limit-source">Managed in Sessions &amp; Mix</span></dd>
+                  </div>
+                </dl>
+              </section>
+            </div>
+            <div class="form-feedback" id="dispatch-feedback" aria-live="polite"></div>
+          </div>
+
+          <div class="card operations-card" id="dispatch-preview-card" style="display: none;">
+            <div class="card-heading"><div><span class="section-kicker">Derived plan</span><h3>Preview</h3></div></div>
+            <div id="dispatch-plan"></div>
+          </div>
+          <div class="form-feedback" id="dispatch-errors" aria-live="polite"></div>
+          <div class="form-feedback" id="deploy-feedback" aria-live="polite"></div>
+
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Auditable objects</span><h3>Batches</h3></div></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Task</th><th>State</th><th>Progress</th><th>Placement</th><th>Cadence</th><th>Created</th><th>Actions</th></tr></thead><tbody id="deployments-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <!-- Local Tools Tab -->
+        <section id="manual-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Local use only</span>
+              <h3>Local Tools</h3>
+              <p>Open the bundled browser by hand — checks, general navigation; it stays open until you close it. Or watch a task list run on a real profile. Direct connection, never counted as run history.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-manual-reload" type="button">Reload</button>
+            </div>
+          </div>
+
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">By hand</span><h3>Manual Browser</h3></div></div>
+            <div class="form-row-2">
+              <div class="form-group"><label for="manual-profile-select">Profile</label><select id="manual-profile-select" class="input-field"></select></div>
+              <div class="form-group"><label for="manual-url-input">URL (blank opens a fresh page)</label><input id="manual-url-input" class="input-field" placeholder="https://example.com"></div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary btn-sm" id="btn-manual-scratch" type="button">Use scratch profile</button>
+              <button class="btn btn-primary" id="btn-manual-open" type="button">Open Browser</button>
+            </div>
+            <div class="form-group manual-proxy-option"><label for="manual-use-proxy"><input type="checkbox" id="manual-use-proxy"> Route through a network endpoint — metered (required for check sites)</label></div>
+            <div class="form-group" id="manual-exit-group" style="display: none;"><label for="manual-exit-select">Routed endpoint</label><select id="manual-exit-select" class="input-field"><option value="">Automatic — region-matched endpoint</option></select><small class="form-hint">Stamped profiles only show their own region’s endpoints; Scratch and other unbound profiles may use any endpoint.</small></div>
+            <div class="form-hint" id="manual-spend-readout">Loading today's metered usage…</div>
+            <div class="form-feedback" id="manual-feedback" aria-live="polite"></div>
+            <div class="table-container compact-table"><table class="data-table"><thead><tr><th>Session</th><th>Profile</th><th>URL</th><th>Status</th><th>Opened</th><th>Actions</th></tr></thead><tbody id="manual-sessions-body"></tbody></table></div>
+          </div>
+
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Scripted rehearsal</span><h3>Local Task Run</h3></div></div>
+            <div class="form-row-2">
+              <div class="form-group"><label for="local-profile-select">Profile</label><select id="local-profile-select" class="input-field"></select></div>
+              <div class="form-group"><label for="local-target-url">Start URL</label><input id="local-target-url" class="input-field" placeholder="https://example.com/report"></div>
+            </div>
+            <div class="form-group"><label for="local-tasks-input">Tasks — one per line: navigate / wait / scroll / click / screenshot / read_title</label><textarea id="local-tasks-input" class="input-field" rows="6" spellcheck="false">navigate https://example.com
+wait 1
+read_title
+screenshot opening</textarea></div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" id="btn-local-preview" type="button">Preview Tasks</button>
+              <button class="btn btn-primary" id="btn-local-run" type="button" disabled>Run Tasks</button>
+            </div>
+            <div class="form-group local-keep-open-option"><label for="local-keep-open"><input type="checkbox" id="local-keep-open"><span>Leave the browser open when the task list finishes so I can inspect it</span></label></div>
+            <div class="form-feedback" id="local-run-feedback" aria-live="polite"></div>
+            <div id="local-task-preview" class="dispatch-plan-line" style="display: none;"></div>
+          </div>
+
+          <div class="card operations-card">
+            <div class="card-heading"><div><span class="section-kicker">Record</span><h3>Recent Local Runs</h3></div></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Run</th><th>Profile</th><th>Target</th><th>Status</th><th>Tasks</th><th>Started</th><th>Actions</th></tr></thead><tbody id="local-runs-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <!-- Monitor Tab -->
+        <section id="monitor-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Monitoring</span>
+              <h3>Monitor</h3>
+              <p>Monitor every group and profile — readiness, current work, score, onboarding, placement, recent errors, and what comes next.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-fleet-refresh" type="button">Refresh</button>
+            </div>
+          </div>
+
+          <div class="metrics-grid" id="fleet-summary">
+            <div class="metric-card"><span class="metric-index">01</span><h4>Active now</h4><p class="metric-value" id="fleet-count-active">0</p></div>
+            <div class="metric-card"><span class="metric-index">02</span><h4>Onboarding (gated)</h4><p class="metric-value" id="fleet-count-onboarding">0</p></div>
+            <div class="metric-card"><span class="metric-index">03</span><h4>Eligible</h4><p class="metric-value text-success" id="fleet-count-eligible">0</p></div>
+            <div class="metric-card"><span class="metric-index">04</span><h4>Quarantined</h4><p class="metric-value" id="fleet-count-quarantined">0</p></div>
+            <div class="metric-card"><span class="metric-index">05</span><h4>Blocked</h4><p class="metric-value" id="fleet-count-blocked">0</p></div>
+          </div>
+          <p class="form-hint" id="fleet-resources">Resources: —</p>
+
+          <div class="card fleet-card-shell">
+            <div id="fleet-container" class="fleet-grid"><p class="console-empty">Loading monitor state…</p></div>
+            <div class="form-feedback" id="fleet-feedback" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Alerts Tab -->
+        <section id="alerts-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">What needs attention now</span>
+              <h3>Alerts</h3>
+              <p>Rule-based notices with a plain-language reason: challenges, quarantine, readiness, streaks, schedules, resources — each ackable, never a silent failure.</p>
+            </div>
+            <div class="action-bar-controls">
+              <select id="pulse-status-filter" class="input-field"><option value="open">Open</option><option value="resolved">Resolved</option><option value="all">All</option></select>
+              <button class="btn btn-secondary" id="btn-pulse-refresh" type="button">Refresh</button>
+              <button class="btn btn-primary" id="btn-pulse-ack-all" type="button">Acknowledge All</button>
+            </div>
+          </div>
+          <p class="form-hint" id="pulse-counts">—</p>
+          <div id="pulse-board" class="pulse-board"><p class="console-empty">Loading alerts…</p></div>
+          <div class="form-feedback" id="pulse-feedback" aria-live="polite"></div>
+        </section>
+
+        <!-- Activity Log Tab -->
+        <section id="console-tab" class="tab-pane">
+          <div class="action-bar">
+            <div class="action-bar-copy">
+              <span class="section-kicker">Append-only activity feed</span>
+              <h3>Activity Log</h3>
+              <p>Every run's activity in one place — actions, navigations, retries and errors, live and kept indefinitely. Local runs are labelled separately.</p>
+            </div>
+            <div class="action-bar-controls">
+              <button class="btn btn-secondary" id="btn-console-refresh" type="button">Refresh</button>
+              <button class="btn btn-secondary" id="btn-console-pause" type="button">Pause stream</button>
+              <button class="btn btn-secondary" id="btn-console-clear" type="button">Clear view</button>
+            </div>
+          </div>
+
+          <div class="card console-card">
+            <div class="console-toolbar">
+              <div class="console-controls">
+                <div class="form-group console-filter-group">
+                  <label for="console-pod-filter">Group</label>
+                  <select id="console-pod-filter" class="input-field"><option value="">All groups</option></select>
+                </div>
+                <div class="form-group console-filter-group console-filter-profiles">
+                  <label>Profiles seen</label>
+                  <div class="console-chips" id="console-profile-chips"></div>
+                </div>
+                <fieldset class="form-group console-filter-group console-severity-group">
+                  <legend>Severity</legend>
+                  <div class="console-chips" id="console-severity-chips">
+                    <button class="console-chip active" data-console-severity="" type="button">All</button>
+                    <button class="console-chip" data-console-severity="info" type="button">Info</button>
+                    <button class="console-chip" data-console-severity="warning" type="button">Warning</button>
+                    <button class="console-chip" data-console-severity="error" type="button">Error</button>
+                    <button class="console-chip" data-console-severity="critical" type="button">Critical</button>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <div class="console-stream-meta">
+              <div class="console-stream-heading"><h3>Events</h3><span class="form-hint" id="console-page-meta">No events loaded yet</span></div>
+              <button class="console-chip console-pending-chip" id="console-pending" type="button" style="display: none;">0 new</button>
+            </div>
+            <div class="console-stream" id="console-stream" role="log" aria-live="polite" aria-relevant="additions">
+              <table class="workspace-table workspace-console-table">
+                <thead><tr><th scope="col">Time</th><th scope="col">Level</th><th scope="col">Event</th><th scope="col">Message</th><th scope="col">Profile</th><th scope="col">Details</th></tr></thead>
+                <tbody id="console-event-body"></tbody>
+              </table>
+            </div>
+            <div class="header-actions console-footer-actions">
+              <button class="btn btn-secondary btn-sm" id="btn-console-older" type="button" disabled>Load older</button>
+              <div class="form-feedback" id="console-feedback" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- System Tab -->
+        <section id="system-tab" class="tab-pane">
+          <div class="card">
+            <div class="card-heading">
+              <div>
+                <span class="section-kicker">Runtime overview</span>
+                <h3>System status</h3>
+              </div>
+              <span class="status-chip"><span class="pulse-indicator"></span><span id="system-health-status">Loading…</span></span>
+            </div>
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <span class="metric-index">01</span>
+                <h4>Application Runtime</h4>
+                <p class="metric-value text-success" id="system-runtime-health">Loading…</p>
+              </div>
+              <div class="metric-card">
+                <span class="metric-index">02</span>
+                <h4>Database Integrity</h4>
+                <p class="metric-value text-accent" id="system-database-integrity">Loading…</p>
+              </div>
+              <div class="metric-card">
+                <span class="metric-index">03</span>
+                <h4>Scheduler</h4>
+                <p class="metric-value" id="system-scheduler-health">Loading…</p>
+              </div>
+              <div class="metric-card">
+                <span class="metric-index">04</span>
+                <h4>Resources</h4>
+                <p class="metric-value" id="system-resource-health">Loading…</p>
+              </div>
+            </div>
+            <p class="card-description">Runtime health is read from the local application. Storage inspection runs only when this page or Operations is opened.</p>
+          </div>
+
+          <div class="card backup-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-kicker">Protected storage</span>
+                <h3>Encrypted profile backup &amp; restore</h3>
+              </div>
+            </div>
+            <p class="card-description">Export profile data and cookies into a portable archive protected by a passphrase and AES-256-GCM.</p>
+            <div class="backup-grid">
+              <div class="backup-panel">
+                <div class="backup-panel-heading">
+                  <span class="backup-step">Export</span>
+                  <p>Create an encrypted snapshot of every local profile.</p>
+                </div>
+                <div class="form-group">
+                  <label for="backup-passphrase-input">Backup passphrase</label>
+                  <input type="password" id="backup-passphrase-input" placeholder="Minimum 12 characters" class="input-field">
+                </div>
+                <button class="btn btn-primary" id="btn-export-backup" type="button">Export Backup</button>
+              </div>
+              <div class="backup-panel">
+                <div class="backup-panel-heading">
+                  <span class="backup-step">Restore</span>
+                  <p>Import a trusted archive into this installation.</p>
+                </div>
+                <div class="form-group">
+                  <label for="restore-path-input">Archive path</label>
+                  <div class="path-picker-row"><input type="text" id="restore-path-input" placeholder="Choose a profile archive" class="input-field"><button class="btn btn-secondary btn-sm" id="btn-choose-restore-backup" type="button">Browse</button></div>
+                </div>
+                <div class="header-actions"><button class="btn btn-secondary" id="btn-preview-restore-backup" type="button">Preview Restore</button><button class="btn btn-primary" id="btn-restore-backup" type="button" disabled>Confirm Restore</button></div>
+                <div id="restore-preview-summary" class="form-hint"></div>
+              </div>
+            </div>
+            <div id="backup-feedback" class="form-feedback" aria-live="polite"></div>
+          </div>
+
+          <div class="card backup-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-kicker">Machine portability</span>
+                <h3>Workspace export &amp; import</h3>
+              </div>
+            </div>
+            <p class="card-description">Everything you input travels: groups, profile metadata, workflows, run history, the activity feed, alerts, batches, schedules, settings and endpoints — with device-bound secrets re-wrapped under your passphrase and profile paths rewritten on import.</p>
+            <div class="backup-grid">
+              <div class="backup-panel">
+                <div class="backup-panel-heading">
+                  <span class="backup-step">Export</span>
+                  <p>Create one encrypted workspace file of this machine.</p>
+                </div>
+                <div class="form-group">
+                  <label for="ws-export-passphrase">Export passphrase</label>
+                  <input type="password" id="ws-export-passphrase" placeholder="Minimum 12 characters" class="input-field">
+                </div>
+                <label class="check-row" for="ws-include-profiles">
+                  <input type="checkbox" id="ws-include-profiles">
+                  <span><strong>Include profiles &amp; cookies</strong><small>Embeds the existing encrypted profile archive; large.</small></span>
+                </label>
+                <button class="btn btn-primary" id="btn-ws-export" type="button">Export Workspace</button>
+              </div>
+              <div class="backup-panel">
+                <div class="backup-panel-heading">
+                  <span class="backup-step">Import</span>
+                  <p>Validate, preview, then replace this install's database from a workspace file.</p>
+                </div>
+                <div class="form-group">
+                  <label for="ws-import-path">Workspace file</label>
+                  <div class="path-picker-row"><input type="text" id="ws-import-path" placeholder="Choose a workspace file" class="input-field"><button class="btn btn-secondary btn-sm" id="btn-ws-choose-import" type="button">Browse</button></div>
+                </div>
+                <div class="form-group">
+                  <label for="ws-import-passphrase">Passphrase</label>
+                  <input type="password" id="ws-import-passphrase" placeholder="The export passphrase" class="input-field">
+                </div>
+                <div class="header-actions"><button class="btn btn-secondary" id="btn-ws-preview" type="button">Preview Import</button><button class="btn btn-primary" id="btn-ws-confirm" type="button" disabled>Confirm Import</button></div>
+                <div id="ws-preview-summary" class="form-hint"></div>
+              </div>
+            </div>
+            <div id="ws-export-feedback" class="form-feedback" aria-live="polite"></div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Create Network Endpoint Modal -->
+  <div class="modal-backdrop" id="create-proxy-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="create-proxy-title">
+    <div class="modal">
+      <div class="modal-header"><div><span class="section-kicker">Network endpoint</span><h3 id="create-proxy-title">Add Endpoint</h3></div><button class="modal-close" id="btn-close-proxy-modal" type="button" aria-label="Close endpoint dialog">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label for="proxy-server-input">Server</label><input id="proxy-server-input" class="input-field" placeholder="http://host:port"></div>
+        <div class="form-row-2">
+          <div class="form-group"><label for="proxy-username-input">Username</label><input id="proxy-username-input" class="input-field" autocomplete="off"></div>
+          <div class="form-group"><label for="proxy-password-input">Password</label><input id="proxy-password-input" class="input-field" type="password" autocomplete="new-password"></div>
+        </div>
+        <div class="form-group"><label for="proxy-type-select">Type</label><select id="proxy-type-select" class="input-field"><option value="datacenter">Datacenter</option><option value="isp">ISP</option><option value="residential">Residential</option><option value="mobile">Mobile</option></select></div>
+        <div class="form-group"><label for="proxy-region-select">Routed metro (optional)</label><select id="proxy-region-select" class="input-field"><option value="">Not region-bound (direct only)</option></select><small class="form-hint">A metro stamps this endpoint’s country, city and timezone for region-matched routing.</small></div>
+        <div class="form-group"><label for="proxy-tier-select">Priced tier (optional)</label><select id="proxy-tier-select" class="input-field"><option value="">Unpriced — bandwidth is metered, but dollar budgets cannot include it</option></select></div>
+        <div class="form-group"><label for="proxy-health-url-input">Health destination override (optional)</label><input id="proxy-health-url-input" class="input-field" placeholder="https://example.com/health"><small class="form-hint">Public HTTPS on port 443 only. Otherwise the global Operations setting is used.</small></div>
+        <div id="proxy-modal-feedback" class="form-feedback" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" id="btn-cancel-proxy" type="button">Cancel</button><button class="btn btn-primary" id="btn-submit-proxy" type="button">Save Endpoint</button></div>
+    </div>
+  </div>
+
+  <!-- Create Group Modal -->
+  <div class="modal-backdrop" id="create-pod-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="create-pod-title">
+    <div class="modal">
+      <div class="modal-header">
+        <div><span class="section-kicker">New group</span><h3 id="create-pod-title">Create New Group</h3></div>
+        <button class="modal-close" id="btn-close-pod-modal" type="button" aria-label="Close create group dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="pod-name-input">Group Name</label>
+          <input type="text" id="pod-name-input" placeholder="e.g., Editorial review" class="input-field">
+        </div>
+        <div class="form-group">
+          <label for="pod-target-input">Target URL (Optional)</label>
+          <input type="text" id="pod-target-input" placeholder="https://example.org/section" class="input-field">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-pod">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-pod">Create Group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Profile Modal -->
+  <div class="modal-backdrop" id="create-profile-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="create-profile-title">
+    <div class="modal">
+      <div class="modal-header">
+        <div><span class="section-kicker">Profile generator</span><h3 id="create-profile-title">Add Profile to Group</h3></div>
+        <button class="modal-close" id="btn-close-profile-modal" type="button" aria-label="Close create profile dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="profile-name-input">Profile Name</label>
+          <input type="text" id="profile-name-input" placeholder="e.g., Reviewer 01" class="input-field">
+        </div>
+        <div class="form-group">
+          <label for="profile-device-select">Desktop Operating System</label>
+          <select id="profile-device-select" class="input-field">
+            <option value="windows" selected>Windows 10/11 Desktop (Blink)</option>
+            <option value="macos">macOS Desktop (Blink)</option>
+          </select>
+          <small class="form-hint" id="profile-device-hint" hidden>Device identity cannot change after creation.</small>
+        </div>
+        <div class="form-group">
+          <label for="profile-region-select">Region</label>
+          <select id="profile-region-select" class="input-field">
+            <option value="">Loading regions&hellip;</option>
+          </select>
+          <small class="form-hint" id="profile-region-hint" hidden>Region is locked after the first run.</small>
+        </div>
+        <div class="form-group">
+          <label for="profile-quality-select">Playback quality</label>
+          <select id="profile-quality-select" class="input-field">
+            <option value="">Inherit group setting</option>
+            <option value="data_saver">Data saver (240–360p)</option>
+            <option value="standard">Standard (360–480p)</option>
+            <option value="high">High (480–720p)</option>
+            <option value="uncapped">Uncapped</option>
+          </select>
+          <small class="form-hint">The group setting is used when this is left on Inherit.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-profile">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-profile">Generate Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launch Session Modal -->
+  <div class="modal-backdrop" id="launch-session-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="session-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <div><span class="section-kicker">Run launcher</span><h3 id="session-modal-title">Configure Run</h3></div>
+        <button class="modal-close" id="btn-close-session-modal" type="button" aria-label="Close run dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Target Profile</label>
+          <p id="session-profile-name" class="profile-name-highlight"></p>
+        </div>
+        <div class="form-group">
+          <label for="session-type-select">Run Mode</label>
+          <select id="session-type-select" class="input-field">
+            <option value="warmer" selected>Onboarding — guided flow (browse &amp; watch)</option>
+            <option value="warmer_browse">Onboarding — browse-only (no video)</option>
+            <option value="target">Target task (gated)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="session-persona-select">Who is this run</label>
+          <select id="session-persona-select" class="input-field">
+            <!-- Dynamically populated profiles and activities -->
+          </select>
+          <small class="form-hint">Profiles run their saved flows. Activities are saved presets that override the flow.</small>
+        </div>
+        <div class="form-group" id="session-target-field">
+          <label for="session-target-override">Target URL (Video or Channel)</label>
+          <input type="text" id="session-target-override" placeholder="https://www.youtube.com/watch?v=..." class="input-field">
+          <small class="form-hint">Used only for Target mode and must match the group target.</small>
+        </div>
+        <div class="form-group">
+          <label for="session-duration-input">Duration (Minutes)</label>
+          <input type="number" id="session-duration-input" value="15" min="2" max="120" class="input-field">
+        </div>
+        <label class="check-row" for="session-headless-checkbox">
+          <input type="checkbox" id="session-headless-checkbox" checked>
+          <span><strong>Run in headless mode</strong><small>Keep the browser in the background.</small></span>
+        </label>
+        <label class="check-row" for="session-show-cursor-checkbox">
+          <input type="checkbox" id="session-show-cursor-checkbox" checked>
+          <span><strong>Enable visual cursor overlay</strong><small>Show the programmed pointer movement.</small></span>
+        </label>
+        <label class="check-row" for="session-regional-test-checkbox">
+          <input type="checkbox" id="session-regional-test-checkbox">
+          <span><strong>Route through a network endpoint (metered)</strong><small>Required for routing. Stamped profiles only ever offer their own region’s endpoints.</small></span>
+        </label>
+        <div class="form-group">
+          <label for="session-regional-proxy-select">Endpoint for this run</label>
+          <select id="session-regional-proxy-select" class="input-field" disabled><option value="">Choose an endpoint…</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-session">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-session">Launch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assistant Planner Modal -->
+  <div class="modal-backdrop" id="ai-workflow-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="ai-workflow-title">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Optional planning</span>
+          <h3 id="ai-workflow-title">Draft a Workflow</h3>
+        </div>
+        <button class="modal-close" id="btn-close-ai-workflow-modal" type="button" aria-label="Close assistant dialog">&times;</button>
+      </div>
+      <div class="modal-body modal-scroll">
+        <p class="subtitle">The assistant creates a draft only. You will review, edit, and explicitly approve it before it can be saved or run.</p>
+        <div class="form-group">
+          <label for="ai-workflow-prompt">What should this workflow verify?</label>
+          <textarea id="ai-workflow-prompt" class="input-field" rows="4" placeholder="Verify the homepage renders, the navigation works, and a search submits."></textarea>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ai-workflow-name">Workflow Name (Optional)</label>
+            <input id="ai-workflow-name" class="input-field" type="text" placeholder="Homepage smoke test">
+          </div>
+          <div class="form-group">
+            <label for="ai-workflow-concurrency">Max Concurrent Runs</label>
+            <input id="ai-workflow-concurrency" class="input-field" type="number" min="1" max="10" value="2">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="ai-workflow-channels">Host Allowlist</label>
+            <input id="ai-workflow-channels" class="input-field" type="text" placeholder="example.org, example.net">
+          </div>
+          <div class="form-group">
+            <label for="ai-workflow-videos">Path Allowlist</label>
+            <input id="ai-workflow-videos" class="input-field" type="text" placeholder="/editorial, /products">
+          </div>
+        </div>
+        <label class="check-row"><input id="ai-workflow-use-ai" type="checkbox" checked><span><strong>Use planning</strong><small>Turn this off to request a deterministic plan directly.</small></span></label>
+        <label class="check-row"><input id="ai-workflow-allow-fallback" type="checkbox" checked><span><strong>Allow deterministic fallback</strong><small>Used only when planning is unavailable, fails, or exceeds its budget.</small></span></label>
+        <div id="ai-workflow-feedback" class="form-feedback" aria-live="polite"></div>
+        <div id="ai-workflow-result" class="preview-section" style="display: none;">
+          <h4 id="ai-workflow-result-title">Generated Plan</h4>
+          <p id="ai-workflow-result-meta" class="form-hint"></p>
+          <ol id="ai-workflow-result-steps" class="preview-timeline"></ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-ai-workflow" type="button">Cancel</button>
+        <button class="btn btn-secondary" id="btn-edit-ai-workflow" type="button" style="display: none;">Review &amp; Edit Draft</button>
+        <button class="btn btn-primary" id="btn-generate-ai-workflow" type="button">Generate Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow Builder Modal -->
+  <div class="modal-backdrop" id="workflow-builder-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="workflow-builder-title">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Workflow designer</span>
+          <h3 id="workflow-builder-title">Create Workflow</h3>
+        </div>
+        <button class="modal-close" id="btn-close-builder-modal" type="button" aria-label="Close builder dialog">&times;</button>
+      </div>
+      <div class="modal-body modal-scroll">
+        <input type="hidden" id="builder-workflow-id" value="">
+
+        <div class="builder-kind-chooser" id="builder-kind-chooser">
+          <p class="builder-kind-question">What kind of workflow is this?</p>
+          <div class="builder-kind-options">
+            <button type="button" class="builder-kind-card" id="btn-builder-kind-site">
+              <strong>Site Workflow</strong>
+              <small>Browse any website — open a URL, wait, scroll, click, capture screenshots.</small>
+            </button>
+            <button type="button" class="builder-kind-card" id="btn-builder-kind-youtube">
+              <strong>Media Workflow</strong>
+              <small>Deterministic checks on a media site — playback, captions, qualities, tabs.</small>
+            </button>
+          </div>
+        </div>
+
+        <div id="builder-fields">
+        <button type="button" class="builder-kind-back" id="btn-builder-change-kind">← Change workflow type</button>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="builder-name-input">Workflow Name</label>
+            <input type="text" id="builder-name-input" placeholder="e.g. Morning blog round" class="input-field">
+          </div>
+          <div class="form-group">
+            <label for="builder-concurrency-input">Max Concurrent Runs</label>
+            <input type="number" id="builder-concurrency-input" value="2" min="1" max="5" class="input-field">
+            <small class="form-hint">How many runs of this workflow may execute at the same time, across profiles.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="builder-desc-input">Description (Optional)</label>
+          <input type="text" id="builder-desc-input" placeholder="What this workflow does, in one line" class="input-field">
+        </div>
+
+        <div class="form-row-2" id="builder-allowlist-row">
+          <div class="form-group">
+            <label for="builder-channels-input">Host Allowlist (Comma-separated, optional)</label>
+            <input type="text" id="builder-channels-input" placeholder="example.org, example.net" class="input-field">
+            <small class="form-hint">Optional. If set, navigations must target these hosts — anything else is refused.</small>
+          </div>
+          <div class="form-group">
+            <label for="builder-videos-input">Path Allowlist (Comma-separated, optional)</label>
+            <input type="text" id="builder-videos-input" placeholder="/editorial, /products" class="input-field">
+            <small class="form-hint">Optional. Restricts verification to these paths.</small>
+          </div>
+        </div>
+
+        <hr class="modal-divider">
+
+        <div class="builder-steps-header">
+          <div>
+            <h4>Workflow Steps</h4>
+            <p class="subtitle">Deterministic test sequence. Steps can be re-ordered and parameterized.</p>
+          </div>
+          <div class="add-step-control">
+            <select id="builder-step-type-select" class="input-field select-step-type">
+              <!-- Options are built from the selected workflow type -->
+            </select>
+            <button class="btn btn-secondary btn-sm" id="btn-builder-add-step" type="button">+ Add Step</button>
+          </div>
+        </div>
+
+        <div class="steps-builder-list" id="builder-steps-container">
+          <!-- Dynamically populated step cards -->
+        </div>
+
+        <div id="builder-feedback" class="form-feedback" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-builder-preview-workflow" type="button">Validate &amp; Preview</button>
+        <button class="btn btn-secondary" id="btn-cancel-builder" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-workflow" type="button">Save Workflow</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launch Workflow Modal -->
+  <div class="modal-backdrop" id="launch-workflow-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="launch-wf-title">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Run launcher</span>
+          <h3 id="launch-wf-title">Run Workflow</h3>
+        </div>
+        <button class="modal-close" id="btn-close-launch-wf-modal" type="button" aria-label="Close launch dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="launch-wf-id" value="">
+        <div class="form-group">
+          <label>Workflow</label>
+          <p id="launch-wf-name" class="profile-name-highlight"></p>
+        </div>
+        <div class="form-group">
+          <label for="launch-wf-profile-select">Target Profile</label>
+          <select id="launch-wf-profile-select" class="input-field">
+            <!-- Dynamically populated profiles from all groups -->
+          </select>
+          <small class="form-hint">Each profile executes in its own isolated browser context.</small>
+        </div>
+        <label class="check-row" for="launch-wf-show-cursor">
+          <input type="checkbox" id="launch-wf-show-cursor" checked>
+          <span><strong>Show visual cursor overlay</strong><small>Render smooth cursor movements.</small></span>
+        </label>
+        <div id="launch-wf-feedback" class="form-feedback" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-launch-wf" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-launch-wf" type="button">Start Workflow</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow Preview & Validation Modal -->
+  <div class="modal-backdrop" id="workflow-preview-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="preview-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Pre-flight inspection</span>
+          <h3 id="preview-modal-title">Workflow Validation &amp; Preview</h3>
+        </div>
+        <button class="modal-close" id="btn-close-preview-modal" type="button" aria-label="Close preview dialog">&times;</button>
+      </div>
+      <div class="modal-body modal-scroll">
+        <div id="preview-status-banner" class="preview-status-banner"></div>
+        <div class="preview-meta-row" id="preview-meta-row"></div>
+        <div id="preview-errors-container" class="preview-section" style="display: none;">
+          <h4 class="text-danger">Validation Errors</h4>
+          <ul id="preview-errors-list" class="preview-list error-list"></ul>
+        </div>
+        <div id="preview-warnings-container" class="preview-section" style="display: none;">
+          <h4 class="text-warning">Warnings</h4>
+          <ul id="preview-warnings-list" class="preview-list warning-list"></ul>
+        </div>
+        <div class="preview-section">
+          <h4>Execution Steps Sequence</h4>
+          <ol id="preview-steps-sequence" class="preview-timeline"></ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-dismiss-preview" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow Run Details Modal -->
+  <div class="modal-backdrop" id="workflow-run-details-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="run-details-title">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Artifact &amp; result inspector</span>
+          <h3 id="run-details-title">Workflow Run Results</h3>
+        </div>
+        <button class="modal-close" id="btn-close-run-details-modal" type="button" aria-label="Close run details dialog">&times;</button>
+      </div>
+      <div class="modal-body modal-scroll">
+        <div class="run-summary-bar" id="run-summary-bar"></div>
+
+        <div class="metrics-grid" id="run-metrics-grid">
+          <!-- Timings and performance metrics -->
+        </div>
+
+        <h4 style="margin-top: 18px; margin-Profiletom: 8px;">Step Execution Results</h4>
+        <div class="step-results-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Step Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Status</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Details / Error</th>
+                <th scope="col">Artifact Screenshot</th>
+              </tr>
+            </thead>
+            <tbody id="run-step-results-tbody">
+              <!-- Dynamically populated step results -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-close-run-details" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Run Report Detail Drawer -->
+  <div class="modal-backdrop" id="report-details-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="report-details-title">
+    <div class="modal modal-lg">
+      <div class="modal-header"><div><span class="section-kicker">Run evidence</span><h3 id="report-details-title">Run Report</h3></div><button class="modal-close" id="btn-close-report-details" type="button" aria-label="Close report detail dialog">&times;</button></div>
+      <div class="modal-body modal-scroll">
+        <div id="report-details-summary" class="run-summary-bar"></div>
+        <div class="preview-section"><h4>Diagnostic Evidence</h4><div id="report-details-evidence"></div></div>
+        <div class="preview-section"><h4>Artifacts</h4><ul id="report-details-artifacts" class="preview-list"></ul></div>
+        <div class="preview-section"><h4>Step Results</h4><ul id="report-details-steps" class="preview-list"></ul></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" id="btn-dismiss-report-details" type="button">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Live Run Drawer -->
+  <div class="live-session-drawer" id="live-session-drawer" style="display: none;" aria-live="polite">
+    <div class="drawer-heading" tabindex="0" aria-label="Move monitor with the arrow keys">
+      <div><span class="section-kicker">Run monitor</span><h4>Browser activity <span class="session-count" id="active-sessions-count">0</span></h4></div>
+      <button class="btn btn-secondary btn-sm" id="btn-close-drawer" type="button">Minimize</button>
+    </div>
+    <div id="live-sessions-container" class="live-sessions-container">
+      <!-- Dynamically populated session cards -->
+    </div>
+  </div>
+  <button class="live-session-restore" id="btn-restore-drawer" type="button" aria-controls="live-session-drawer" aria-label="Restore browser activity monitor" hidden>
+    <span class="restore-indicator" aria-hidden="true"></span>
+    <span>Browser activity</span>
+    <span class="restore-count" id="restore-sessions-count">0 live</span>
+  </button>
+
+  <div class="modal-backdrop" id="watch-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="watch-title">
+    <div class="modal">
+      <div class="modal-header"><div><span class="section-kicker">Live profile view</span><h3 id="watch-title">Watch live</h3></div><button class="modal-close" id="btn-close-watch" type="button" aria-label="Close watch view">&times;</button></div>
+      <div class="modal-body">
+        <div id="watch-stage" class="watch-stage"><img id="watch-frame" alt="Live run frame" draggable="false"><div id="watch-cursor" class="watch-cursor"></div></div>
+        <div class="watch-meta"><span id="watch-status">Waiting for frames…</span><span id="watch-frames"></span></div>
+        <div id="watch-feedback" class="form-feedback" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-secondary" id="btn-stop-watch" type="button">Stop watching</button><button class="btn btn-primary" id="btn-close-watch-secondary" type="button">Close</button></div>
+    </div>
+  </div>
+  <script src="js/brand.js"></script>
+  <script src="js/bridge-mock.js"></script>
+  <script src="js/startup-motion.js?v=1"></script>
+  <script src="js/fleet-presentation.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
+  <script src="js/current-controls.js?v=1"></script>
+  <script src="js/mission-control.js?v=1"></script>
+  <script src="js/workspace.js?v=1"></script>
+  <script src="js/workspace-records.js?v=1"></script>
+  <script src="js/workspace-form-rules.js?v=1"></script>
+  <script src="js/workspace-schedule-model.js?v=1"></script>
+  <script src="js/workspace-schedule-center.js?v=1"></script>
+  <script src="js/current-watch.js?v=1"></script>
+  <script src="js/workspace-watch.js?v=1"></script>
+  <script src="js/workspace-preview-model.js?v=1"></script>
+  <script src="js/workspace-preview.js?v=1"></script>
+  <script src="js/behavior-contract.js?v=1"></script>
+  <script src="js/playbook-contract.js?v=1"></script>
+  <script src="js/playbook-studio.js?v=1"></script>
+  <script src="js/pod-workspace.js?v=1"></script>
+  <script src="js/rhythm-controls.js?v=1"></script>
+  <script src="js/focus-layout.js?v=1"></script>
+  <script src="js/workflow-canvas.js?v=1"></script>
+  <script src="js/local-task-flow.js?v=1"></script>
+  <script src="js/nav-motion.js?v=1"></script>
+  <script src="js/window-visibility.js?v=1"></script>
+</body>
+</html>

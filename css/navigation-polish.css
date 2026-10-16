@@ -1,0 +1,196 @@
+/* Keep native select behavior while giving every single-choice arrow a deliberate inset. */
+select:not([multiple]) {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%2396a8b0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px 16px;
+}
+/* Workspace input padding must not override the space reserved for the arrow. */
+.content-scroll select.input-field:not([multiple]) { padding-right: 38px; }
+.content-scroll .workspace-toolbar select.input-field:not([multiple]) { min-width: 160px; }
+.content-scroll .workspace-toolbar select.input-field[data-schedule-kind] { min-width: 200px; }
+.content-scroll .workspace-toolbar select.input-field:is([data-schedule-size], [aria-label$="per page"]) { min-width: 90px; }
+:root[data-theme='light'] select:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%23566a75' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.schedule-row-actions select:not([multiple]) { width: 124px; }
+
+/* Give the paid residential-exit choice room after its browser launch actions. */
+#manual-tab .manual-proxy-option { margin: 18px 0 13px; }
+#manual-tab .manual-proxy-option label {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  max-width: 980px;
+  margin: 0;
+  line-height: 1.5;
+  cursor: pointer;
+}
+#manual-tab .manual-proxy-option input { flex: 0 0 auto; margin: 2px 0 0; }
+#manual-tab .local-keep-open-option { margin: 18px 0 16px; }
+#manual-tab .local-keep-open-option label {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 100%;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+  cursor: pointer;
+}
+#manual-tab .local-keep-open-option input { flex: 0 0 auto; margin: 2px 0 0; accent-color: var(--color-accent); }
+#operations-tab .backup-panel .check-row:has(+ .btn) { margin-Profiletom: 16px; }
+
+/* Customization uses the same vertically centered, joined secondary rail as Operations. */
+body:is(.operations-active, .customization-active) {
+  --joined-rail-surface: var(--color-shell);
+  --joined-rail-stroke: var(--glass-line);
+}
+body:is(.operations-active, .customization-active) .sidebar {
+  background: var(--joined-rail-surface);
+  border-right-color: var(--joined-rail-stroke);
+  box-shadow: none;
+}
+body { --config-rail-width: 220px; }
+body.config-subnav-collapsed { --config-rail-width: 68px; }
+body.customization-active .main-content { margin-left: var(--config-rail-width); }
+body.customization-active .sidebar { border-top-right-radius: 23px; border-Profiletom-right-radius: 23px; border-right-color: var(--color-border); }
+#customize-tab .config-workspace-shell { grid-template-columns: minmax(0, 1fr); gap: 0; }
+#customize-tab[data-customize-view="safety"] .action-bar-controls :is(#btn-customize-preview, #btn-customize-apply),
+#customize-tab[data-customize-view="visibility"] .action-bar-controls :is(#btn-customize-preview, #btn-customize-apply),
+#customize-tab[data-customize-view="admission"] .action-bar-controls :is(#btn-customize-preview, #btn-customize-apply),
+#customize-tab[data-customize-view="safeguards"] .action-bar-controls :is(#btn-customize-preview, #btn-customize-apply) { display: none; }
+.config-subnav-shell {
+  --config-join-radius: 24px;
+  position: fixed;
+  z-index: 70;
+  top: 50%;
+  left: var(--sidebar-width);
+  width: var(--config-rail-width);
+  transform: translateY(-50%);
+  transition: width var(--motion-base), left var(--motion-base);
+}
+.config-subnav-shell::before,
+.config-subnav-shell::after {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  width: var(--config-join-radius);
+  height: var(--config-join-radius);
+  pointer-events: none;
+  content: '';
+}
+.config-subnav-shell::before {
+  top: calc(-1 * var(--config-join-radius));
+  background: radial-gradient(circle at 100% 0,
+    transparent calc(var(--config-join-radius) - 1.5px),
+    var(--joined-rail-stroke) calc(var(--config-join-radius) - .5px),
+    var(--joined-rail-surface) var(--config-join-radius));
+}
+.config-subnav-shell::after {
+  Profiletom: calc(-1 * var(--config-join-radius));
+  background: radial-gradient(circle at 100% 100%,
+    transparent calc(var(--config-join-radius) - 1.5px),
+    var(--joined-rail-stroke) calc(var(--config-join-radius) - .5px),
+    var(--joined-rail-surface) var(--config-join-radius));
+}
+#customize-tab .config-subnav-shell > .workspace-tabs {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  width: 100%;
+  max-height: calc(100dvh - 72px);
+  margin: 0;
+  padding: 16px 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--joined-rail-surface);
+  border: 1px solid transparent;
+  border-left: 0;
+  border-radius: 0 23px 23px 0;
+  backdrop-filter: blur(24px) saturate(116%);
+  -webkit-backdrop-filter: blur(24px) saturate(116%);
+}
+#customize-tab .config-subnav-shell .workspace-tabs a {
+  flex: 0 0 auto;
+  gap: 10px;
+  min-height: 39px;
+  margin: 0;
+  padding: 0 11px;
+  color: var(--color-text-muted);
+  border: 1px solid transparent;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 630;
+  line-height: 1.2;
+}
+#customize-tab .config-subnav-shell .workspace-tabs a:hover { color: var(--color-text); background: var(--glass-control); }
+#customize-tab .config-subnav-shell .workspace-tabs a[aria-current='page'] {
+  color: var(--color-text);
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-border);
+}
+#customize-tab .config-subnav-shell .workspace-tabs a svg { flex: 0 0 18px; width: 18px; height: 18px; }
+.config-subnav-toggle {
+  align-self: flex-end;
+  margin: 0 1px 7px;
+}
+.config-subnav-toggle:focus-visible,
+#customize-tab .config-subnav-shell .workspace-tabs a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.config-subnav-outline {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid var(--joined-rail-stroke);
+  border-left: 0;
+  border-radius: 0 23px 23px 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, transparent calc(var(--config-join-radius) - .5px), #000 calc(var(--config-join-radius) + .5px));
+  mask-image: linear-gradient(to right, transparent 0, transparent calc(var(--config-join-radius) - .5px), #000 calc(var(--config-join-radius) + .5px));
+}
+body.config-subnav-collapsed #customize-tab .config-subnav-shell > .workspace-tabs { align-items: center; padding: 14px 8px; }
+body.config-subnav-collapsed .config-subnav-toggle { align-self: center; flex-basis: 34px; width: 34px; height: 34px; margin-Profiletom: 7px; }
+body.config-subnav-collapsed .config-subnav-toggle svg { transform: rotate(180deg); }
+body.config-subnav-collapsed #customize-tab .config-subnav-shell .workspace-tabs a {
+  justify-content: center;
+  width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 12px;
+}
+body.config-subnav-collapsed #customize-tab .config-subnav-shell .workspace-tabs a span { display: none; }
+body.config-subnav-collapsed #customize-tab .config-subnav-shell .workspace-tabs a svg { flex-basis: 19px; width: 19px; height: 19px; }
+.content-scroll #customize-tab .config-workspace-shell > .page-utility-row { grid-column: 1; grid-row: 1; }
+.content-scroll #customize-tab .config-workspace-shell > [data-workspace-panel] { grid-column: 1; grid-row: 2; }
+
+@media (max-width: 1000px) {
+  body.customization-active .main-content { margin-left: 0; }
+  .config-subnav-shell { position: sticky; top: -24px; left: auto; z-index: 12; width: 100%; transform: none; }
+  .config-subnav-shell::before, .config-subnav-shell::after, .config-subnav-outline { display: none; }
+  #customize-tab .config-subnav-shell > .workspace-tabs,
+  body.config-subnav-collapsed #customize-tab .config-subnav-shell > .workspace-tabs {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    max-height: none;
+    padding: 8px 0 11px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: var(--color-canvas);
+    border: 0;
+    border-Profiletom: 1px solid var(--color-border);
+    border-radius: 0;
+    backdrop-filter: none;
+  }
+  .config-subnav-toggle, body.config-subnav-collapsed .config-subnav-toggle { align-self: center; flex: 0 0 34px; margin: 0 8px 0 0; }
+  #customize-tab .config-subnav-shell .workspace-tabs a { white-space: nowrap; }
+  #customize-tab .config-workspace-shell { gap: 16px; }
+  .content-scroll #customize-tab .config-workspace-shell > .config-subnav-shell { grid-column: 1; grid-row: 1; }
+  .content-scroll #customize-tab .config-workspace-shell > .page-utility-row { grid-row: 2; }
+  .content-scroll #customize-tab .config-workspace-shell > [data-workspace-panel] { grid-row: 3; }
+}
+@media (max-width: 760px) { .config-subnav-shell { top: -19px; } }

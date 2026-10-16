@@ -1,0 +1,151 @@
+/* Registered startup motion: Prism 23.
+   This file belongs only to the UI sandbox and does not change application data. */
+.app-startup-motion {
+  --startup-size: clamp(148px, 18vw, 190px);
+  position: fixed;
+  z-index: 1600;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--color-text, #f0f6f7);
+  background: transparent;
+  opacity: 1;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+.app-startup-motion[hidden] { display: none; }
+.app-startup-motion::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: '';
+  background: linear-gradient(145deg, rgba(216, 240, 247, .045), transparent 42%, rgba(120, 181, 198, .025)), var(--glass-veil, rgba(6, 13, 18, .66));
+}
+.app-startup-motion::after {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  content: '';
+  pointer-events: none;
+  border: 1px solid rgba(199, 225, 235, .08);
+}
+.startup-motion-composition {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 16px;
+  will-change: opacity;
+}
+.startup-prism-stage {
+  display: grid;
+  width: min(310px, 100%);
+  height: calc(var(--startup-size) + 44px);
+  place-items: center;
+  flex: none;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+}
+.startup-prism-rig {
+  position: relative;
+  width: var(--startup-size);
+  height: var(--startup-size);
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.startup-prism-pane {
+  position: absolute;
+  border: 1px solid rgba(167, 222, 235, .32);
+  border-radius: 31px;
+  background: linear-gradient(145deg, rgba(197, 234, 243, .10), rgba(110, 179, 197, .025) 52%, rgba(157, 216, 231, .065));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09);
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  will-change: opacity, transform;
+}
+.startup-prism-pane-back { inset: -18px; border-color: rgba(151, 209, 224, .16); border-radius: 37px; }
+.startup-prism-pane-middle { inset: -9px; border-color: rgba(165, 220, 233, .24); border-radius: 34px; }
+.startup-prism-pane-front {
+  inset: 0;
+  background: linear-gradient(140deg, rgba(194, 234, 244, .15), rgba(155, 217, 233, .025) 60%, rgba(171, 224, 237, .09));
+}
+.startup-prism-pane-front::after {
+  position: absolute;
+  inset: 6px;
+  content: '';
+  border: 1px solid rgba(191, 231, 241, .065);
+  border-radius: 25px;
+}
+.startup-prism-mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+  will-change: opacity, transform;
+}
+.startup-prism-mark img { display: block; width: 64%; height: 64%; object-fit: contain; }
+.startup-motion-copy { max-width: 100%; margin-top: 27px; text-align: center; will-change: opacity, transform; }
+.startup-motion-copy h2 {
+  margin: 0;
+  font-size: clamp(24px, 2.65vw, 36px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -.055em;
+}
+.startup-motion-copy p { margin: 8px 0 0; color: var(--color-text-muted, #96a8b0); font-size: 12px; line-height: 1.5; }
+.startup-motion-progress {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-Profiletom: 20px;
+  margin-top: 24px;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.startup-motion-progress > span {
+  width: 145px;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-border, rgba(199, 225, 235, .13));
+  border-radius: 6px;
+}
+.startup-motion-progress i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-accent-strong, #c2eaf4);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 280ms cubic-bezier(.22, .7, .25, 1);
+}
+body.startup-motion-running { overflow: hidden; }
+body.startup-motion-running .app-container { opacity: var(--startup-workspace-opacity, .72); filter: blur(18px) saturate(82%); transform: translateY(var(--startup-workspace-y, 18px)) scale(var(--startup-workspace-scale, .986)); }
+
+:root[data-theme="light"] .app-startup-motion { color: var(--color-text); }
+:root[data-theme="light"] .startup-prism-pane {
+  border-color: rgba(54, 121, 141, .23);
+  background: linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(166, 211, 222, .10) 60%, rgba(255, 255, 255, .42));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+:root[data-theme="light"] .startup-prism-pane-back { border-color: rgba(54, 121, 141, .12); }
+:root[data-theme="light"] .startup-prism-pane-middle { border-color: rgba(54, 121, 141, .18); }
+
+@media (max-width: 520px) {
+  .app-startup-motion { --startup-size: clamp(136px, 44vw, 168px); }
+  .startup-motion-composition { padding: 18px 12px; }
+  .startup-motion-copy { margin-top: 20px; }
+  .startup-motion-copy h2 { font-size: clamp(22px, 7.2vw, 28px); }
+  .startup-motion-copy p { margin-top: 7px; font-size: 11px; }
+  .startup-motion-progress { padding-Profiletom: 19px; margin-top: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-startup-motion *, .app-startup-motion { transition: none !important; }
+}

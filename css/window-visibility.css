@@ -1,0 +1,10 @@
+/* A separate sandbox preview of desktop window management, not runtime settings. */
+#customize-visibility-card .card-description { max-width: 830px; }
+#customize-visibility-card .visibility-preview-fields { gap: 22px 28px; }
+#customize-visibility-card .visibility-preview-fields .form-group { margin: 0; }
+#customize-visibility-card .visibility-preview-fields .form-hint { display: block; max-width: 460px; line-height: 1.5; }
+#customize-visibility-card .header-actions { margin-top: 24px; }
+#customize-visibility-card #visibility-feedback { min-height: 0; margin-top: 12px; }
+#customize-visibility-card #visibility-feedback:empty { display: none; }
+#customize-visibility-card #visibility-feedback[data-state="success"] { color: var(--color-success); }
+#customize-visibility-card #visibility-feedback[data-state="error"] { color: var(--color-danger); }

@@ -1,0 +1,33 @@
+/* Shared moving markers for horizontal tabs and the two navigation rails. */
+.workspace-tabs,
+.pod-workspace-nav,
+.nav-menu,
+.operations-subnav { position: relative; }
+.nav-motion-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  will-change: transform, width, height;
+}
+.nav-motion-ready > .nav-motion-marker {
+  opacity: 1;
+  transition: transform 220ms cubic-bezier(.22,1,.36,1), width 220ms cubic-bezier(.22,1,.36,1), height 220ms cubic-bezier(.22,1,.36,1);
+}
+.nav-motion-line { z-index: 1; background: var(--color-accent); }
+.nav-motion-pill { z-index: 0; background: var(--color-accent-soft); border: 1px solid var(--color-accent-border); border-radius: 12px; }
+.nav-motion-pill.nav-motion-danger { background: rgba(240,146,153,.1); border-color: rgba(240,146,153,.3); }
+.nav-motion-ready.workspace-tabs a[aria-current='page'],
+.nav-motion-ready.pod-workspace-nav button.active { border-Profiletom-color: transparent; }
+.nav-motion-ready.nav-menu .nav-item.active,
+.nav-motion-ready.operations-subnav .operations-subnav-item.active,
+#customize-tab .config-subnav-shell > .workspace-tabs.nav-motion-ready a[aria-current='page'] { background: transparent; border-color: transparent; }
+.nav-motion-ready.nav-menu .mission-nav-group,
+.nav-motion-ready.operations-subnav .operations-subnav-item,
+#customize-tab .config-subnav-shell > .workspace-tabs.nav-motion-ready a { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .nav-motion-ready > .nav-motion-marker { transition: none; }
+}

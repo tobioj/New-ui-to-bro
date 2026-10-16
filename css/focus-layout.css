@@ -1,0 +1,158 @@
+/* A single page title and a compact action dock leave the first viewport for work. */
+.topbar {
+  height: 72px;
+  min-height: 72px;
+  flex-basis: 72px;
+}
+.topbar-title-row { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.topbar-title-row h2 { min-width: 0; margin: 0; }
+.page-info-button,
+.inline-info-button {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--glass-line);
+  border-radius: 50%;
+  background: var(--glass-control);
+  color: var(--color-accent);
+  font: 700 12px/1 Georgia, serif;
+  cursor: help;
+}
+.page-info-button:hover,
+.page-info-button:focus-visible,
+.inline-info-button:hover,
+.inline-info-button:focus-visible { border-color: var(--color-accent); outline: none; }
+.page-info-popover {
+  position: fixed;
+  z-index: 400;
+  width: min(360px, calc(100vw - 28px));
+  padding: 15px 17px;
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  background: var(--glass-shell);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(28px) saturate(118%);
+  -webkit-backdrop-filter: blur(28px) saturate(118%);
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+}
+.page-info-popover[hidden] { display: none; }
+.content-scroll { padding-top: 12px; }
+.content-scroll .tab-pane > .action-bar { min-height: 0; padding: 0; margin: 0; }
+.content-scroll .tab-pane > .action-bar .action-bar-copy { display: none; }
+.content-scroll .tab-pane > .action-bar.no-page-actions { display: none; }
+.content-scroll .page-utility-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 0 0 18px;
+  border-Profiletom: 1px solid var(--color-border);
+}
+.content-scroll .page-utility-row > .workspace-tabs,
+.content-scroll .page-utility-row > .account-workspace-nav,
+.content-scroll .page-utility-row > #pod-list-container {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  border-Profiletom: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.content-scroll .page-utility-row > #pod-list-container { padding-Profiletom: 8px; }
+.content-scroll .page-utility-row > .workspace-tabs {
+  align-self: stretch;
+  align-items: flex-end;
+}
+.content-scroll .page-utility-row > .workspace-tabs a { margin-Profiletom: 0; }
+.content-scroll .page-utility-row .action-bar-controls,
+.content-scroll .workspace-toolbar .action-bar-controls,
+.content-scroll .workspace-fleet-podbar .action-bar-controls,
+.content-scroll .report-filter-head .action-bar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  margin: 0 0 7px auto;
+  flex-wrap: wrap;
+}
+.content-scroll .workspace-toolbar .action-bar-controls,
+.content-scroll .workspace-fleet-podbar .action-bar-controls,
+.content-scroll .report-filter-head .action-bar-controls { margin-Profiletom: 0; }
+.content-scroll .page-utility-row .action-bar-controls .btn,
+.content-scroll .workspace-toolbar .action-bar-controls .btn,
+.content-scroll .workspace-fleet-podbar .action-bar-controls .btn,
+.content-scroll .report-filter-head .action-bar-controls .btn { flex: 0 0 auto; white-space: nowrap; }
+.content-scroll .page-utility-row-content,
+.content-scroll .page-utility-row-solo { justify-content: flex-end; min-height: 42px; }
+.content-scroll .page-utility-row-content .action-bar-controls,
+.content-scroll .page-utility-row-solo .action-bar-controls { margin-left: auto; }
+.content-scroll #operations-tab .page-utility-row-content .action-bar-controls { width: 100%; }
+.content-scroll #operations-tab .operations-status-chip { margin-right: auto; }
+.content-scroll #customize-tab .config-workspace-shell > .workspace-tabs { grid-column: 1; grid-row: 1 / 3; }
+.content-scroll #customize-tab .config-workspace-shell > .page-utility-row { grid-column: 2; grid-row: 1; }
+.content-scroll #customize-tab .config-workspace-shell > [data-workspace-panel] { grid-column: 2; grid-row: 2; }
+.content-scroll .report-filter-head { flex-wrap: wrap; gap: 8px; }
+.content-scroll .report-filter-head .action-bar-controls { margin-left: 0; }
+.content-scroll .workspace-toolbar.has-page-actions,
+.content-scroll .workspace-fleet-podbar.has-page-actions { align-items: end; }
+.content-scroll .workspace-toolbar.has-page-actions .workspace-count { margin-left: 0; }
+#pulse-counts.workspace-pulse-summary {
+  display: flex;
+  align-items: center;
+  gap: 9px 24px;
+  flex-wrap: wrap;
+  padding: 0 0 11px;
+  margin: 0 0 15px;
+  border-Profiletom: 1px solid var(--color-border);
+  font-size: 12px;
+}
+#pulse-counts.workspace-pulse-summary span { display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap; }
+#pulse-counts.workspace-pulse-summary strong { font-size: 18px; line-height: 1.2; }
+.pod-overview-intro p.info-collapsed,
+.pod-panel-heading p.info-collapsed,
+.operations-view .card-description.info-collapsed,
+#customize-visibility-card .card-description.info-collapsed,
+#view-configure-customization-safeguards-tiers > .form-hint.info-collapsed,
+#system-tab > .card .card-description.info-collapsed { display: none; }
+#system-tab > .card:first-of-type .card-heading { justify-content: flex-end; margin-Profiletom: 10px; }
+#system-tab > .card:first-of-type .card-heading > div { display: none; }
+.pod-overview-intro h4,
+.pod-panel-heading h4,
+.operations-view .card-heading h3,
+#customize-visibility-card .card-heading h3,
+#view-configure-customization-safeguards-tiers > h4 { display: inline; }
+.pod-overview-intro .inline-info-button,
+.pod-panel-heading .inline-info-button,
+.operations-view .card-heading .inline-info-button,
+#customize-visibility-card .card-heading .inline-info-button,
+#view-configure-customization-safeguards-tiers > .inline-info-button { margin-left: 8px; vertical-align: 2px; }
+.pod-overview-intro { margin-Profiletom: 12px; }
+.content-scroll .pod-overview-intro .pod-eyebrow { display: none; }
+
+@media (max-width: 760px) {
+  .topbar { height: 60px; min-height: 60px; flex-basis: 60px; }
+  .content-scroll { padding-top: 10px; }
+  .content-scroll .page-utility-row { flex-wrap: wrap; gap: 0 10px; }
+  .content-scroll .page-utility-row > .workspace-tabs,
+  .content-scroll .page-utility-row > .account-workspace-nav,
+  .content-scroll .page-utility-row > #pod-list-container { flex-basis: 100%; }
+  .content-scroll .page-utility-row .action-bar-controls { justify-content: flex-start; margin-left: 0; padding: 7px 0; }
+  .content-scroll #customize-tab .config-workspace-shell > .workspace-tabs { grid-column: 1; grid-row: 1; }
+  .content-scroll #customize-tab .config-workspace-shell > .page-utility-row { grid-column: 1; grid-row: 2; }
+  .content-scroll #customize-tab .config-workspace-shell > [data-workspace-panel] { grid-column: 1; grid-row: 3; }
+  .content-scroll .workspace-toolbar .action-bar-controls,
+  .content-scroll .workspace-fleet-podbar .action-bar-controls { margin-left: 0; }
+}
